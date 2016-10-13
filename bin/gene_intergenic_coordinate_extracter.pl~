@@ -125,8 +125,6 @@ for($i=0; $i<$gene_count; $i++){
 			$int_name="${gene_pre}_+_+_${gene_pos}_+_+_$int_type";
 		}
 	}
-	
-	
 	if($i > 0 && $gene_array[($i-1)][7] eq $gene_array[$i][7]){
 	$int_len=(($int_end - $int_sta) + 1);
 	
