@@ -1,20 +1,17 @@
 #!/usr/bin/perl -w
 
 $isolate=$ARGV[0];
-$in_dir=$ARGV[1];
-$out_dir=$ARGV[2];
+$in_file=$ARGV[1];
+$in_coor_file=$ARGV[2];
+$out_dir=$ARGV[3];
+$out_iso_dir=$ARGV[4];
 
 $min_len=30;
 
-open LOG, ">>$out_dir/log.txt";
-
-mkdir "$out_dir/isolate_intergenic_files/$isolate";
-
-#open OUTPUT, ">$out_dir/isolate_intergenic_files/$isolate/$isolate.fasta";
 open OUTPUT, ">>$out_dir/output_fasta.fasta";
 
 $include=0;
-open INPUT, "$in_dir/$isolate.gff.modified";
+open INPUT, "$in_file";
 while(<INPUT>){
 	$line=$_;
 	chomp $line;
@@ -43,7 +40,7 @@ while(<INPUT>){
 foreach $contig(@contig_array){
 	$contig_seq=$contig_hash{$contig};
 	
-	open INCOOR, "$out_dir/coordinate_files/${isolate}_intergenic_coordinates.tab";
+	open INCOOR, "$in_coor_file";
 	while(<INCOOR>){
 		$line=$_;
 		chomp $line;
@@ -71,15 +68,11 @@ foreach $contig(@contig_array){
 					}
 					print OUTPUT ">$int_id\n$int_seq\n";
 					
-					open OUTPUT_ISOLATE, ">$out_dir/isolate_intergenic_files/$isolate/$int_id.fasta";
+					open OUTPUT_ISOLATE, ">$out_iso_dir/$int_id.fasta";
 					print OUTPUT_ISOLATE ">$int_id\n$int_seq\n";
 				}
 			}
 		}
 	}
 }
-
-print "$isolate intergenic fasta file produced.\n";
-
-print LOG "$isolate intergenic alignment split.\n";
 

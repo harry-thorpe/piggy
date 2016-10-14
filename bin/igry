@@ -74,6 +74,11 @@ do
 	printf "%s\n" $i >> "$out_dir/isolates.txt"
 done
 
+if [ ! -d "$out_dir/coordinate_files" ]
+then
+	mkdir "$out_dir/coordinate_files"
+fi
+
 if [ -f "$out_dir/output_fasta.fasta" ]
 then
 	rm "$out_dir/output_fasta.fasta"
@@ -84,18 +89,16 @@ then
 	mkdir "$out_dir/isolate_intergenic_files"
 fi
 
-if [ ! -d "$out_dir/coordinate_files" ]
-then
-	mkdir "$out_dir/coordinate_files"
-fi
-
 for isolate in ${isolate_array[@]}
 do
-	gff_modifier.pl "$isolate" "$in_dir" "$out_dir"
+	gff_modifier.pl "$in_dir/$isolate.gff"
+	printf "%s gff modified.\n" $isolate >> "$out_dir/log.txt"
 	
-	gene_intergenic_coordinate_extracter.pl "$isolate" "$in_dir" "$out_dir"
+	gene_intergenic_coordinate_extracter.pl "$isolate" "$in_dir/$isolate.gff.modified" "$out_dir/coordinate_files"
+	printf "%s gene intergenic coordinates extracted.\n" $isolate >> "$out_dir/log.txt"
 	
-	intergenic_sequence_extracter.pl "$isolate" "$in_dir" "$out_dir"
+	intergenic_sequence_extracter.pl "$isolate" "$in_dir/$isolate.gff.modified" "$out_dir/coordinate_files/${isolate}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/$isolate"
+	printf "%s sequences extracted.\n" $isolate >> "$out_dir/log.txt"
 done
 
 if [ 1 -eq 0 ]; then

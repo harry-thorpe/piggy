@@ -1,17 +1,15 @@
 #!/usr/bin/perl -w
 
 $isolate=$ARGV[0];
-$in_dir=$ARGV[1];
+$in_file=$ARGV[1];
 $out_dir=$ARGV[2];
 
-open LOG, ">>$out_dir/log.txt";
-
-open OUTPUT_G, ">$out_dir/coordinate_files/${isolate}_gene_coordinates.tab";
+open OUTPUT_G, ">$out_dir/${isolate}_gene_coordinates.tab";
 print OUTPUT_G "Name\tGene\tStart\tEnd\tLength\tType\tStrand\tContig\n";
-open OUTPUT_I, ">$out_dir/coordinate_files/${isolate}_intergenic_coordinates.tab";
+open OUTPUT_I, ">$out_dir/${isolate}_intergenic_coordinates.tab";
 print OUTPUT_I "Name\tGene_name\tStart\tEnd\tLength\tType\tContig\n";
 
-open INPUT, "$in_dir/$isolate.gff.modified";
+open INPUT, "$in_file";
 while(<INPUT>){
 	$line=$_;
 	chomp $line;
@@ -85,7 +83,9 @@ for($i=0; $i<$gene_count; $i++){
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
 		
-		print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		if($int_len > 0){
+			print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		}
 	}
 	# Last gene.
 	elsif($i == ($gene_count - 1)){
@@ -102,7 +102,9 @@ for($i=0; $i<$gene_count; $i++){
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
 		
-		print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		if($int_len > 0){
+			print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		}
 	}
 	# Gene on different contig.
 	elsif($gene_array[($i-1)][7] ne $gene_array[$i][7]){
@@ -120,7 +122,9 @@ for($i=0; $i<$gene_count; $i++){
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
 		
-		print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		if($int_len > 0){
+			print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		}
 		
 		# Edge of next contig.
 		$contig=$gene_array[$i][7];
@@ -136,7 +140,9 @@ for($i=0; $i<$gene_count; $i++){
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
 		
-		print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		if($int_len > 0){
+			print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		}
 	}
 	# Gene on same contig.
 	elsif($gene_array[($i-1)][7] eq $gene_array[$i][7]){
@@ -169,11 +175,11 @@ for($i=0; $i<$gene_count; $i++){
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
 		
-		print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		if($int_len > 0){
+			print OUTPUT_I "$int_id\t$int_name\t$int_sta\t$int_end\t$int_len\t$int_type\t$contig\n";
+		}
 	}
 }
 
 print "$isolate gene intergenic coordinates extracted.\n";
-
-print LOG "$isolate gene intergenic coordinates extracted.\n";
 
