@@ -80,7 +80,7 @@ for($i=0; $i<$gene_count; $i++){
 		$gene_pre="NA";
 		$gene_pos=$gene_array[$i][0];
 		$int_type="NA";
-		$int_name="${gene_pre}_${gene_pos}_$int_type";
+		$int_name="${gene_pre}_+_+_${gene_pos}_+_+_$int_type";
 		
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
@@ -97,7 +97,7 @@ for($i=0; $i<$gene_count; $i++){
 		$gene_pre=$gene_array[$i][0];
 		$gene_pos="NA";
 		$int_type="NA";
-		$int_name="${gene_pre}_${gene_pos}_$int_type";
+		$int_name="${gene_pre}_+_+_${gene_pos}_+_+_$int_type";
 		
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
@@ -115,7 +115,7 @@ for($i=0; $i<$gene_count; $i++){
 		$gene_pre=$gene_array[($i-1)][0];
 		$gene_pos="NA";
 		$int_type="NA";
-		$int_name="${gene_pre}_${gene_pos}_$int_type";
+		$int_name="${gene_pre}_+_+_${gene_pos}_+_+_$int_type";
 		
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
@@ -125,13 +125,13 @@ for($i=0; $i<$gene_count; $i++){
 		# Edge of next contig.
 		$contig=$gene_array[$i][7];
 		$int_sta=1;
-		$int_end=($gene_array[$i][3] - 1);
+		$int_end=($gene_array[$i][2] - 1);
 		$int_len=(($int_end - $int_sta) + 1);
 		
 		$gene_pre="NA";
 		$gene_pos=$gene_array[$i][0];
 		$int_type="NA";
-		$int_name="${gene_pre}_${gene_pos}_$int_type";
+		$int_name="${gene_pre}_+_+_${gene_pos}_+_+_$int_type";
 		
 		$int_count++;
 		$int_id="${isolate}_intergenic_$int_count";
