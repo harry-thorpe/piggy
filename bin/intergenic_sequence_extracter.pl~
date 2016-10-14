@@ -10,6 +10,7 @@ open LOG, ">>$out_dir/log.txt";
 
 mkdir "$out_dir/isolate_intergenic_files/$isolate";
 
+#open OUTPUT, ">$out_dir/isolate_intergenic_files/$isolate/$isolate.fasta";
 open OUTPUT, ">>$out_dir/output_fasta.fasta";
 
 $include=0;

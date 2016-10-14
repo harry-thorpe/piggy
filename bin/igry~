@@ -91,7 +91,7 @@ fi
 
 for isolate in ${isolate_array[@]}
 do
-	gff_modifier.pl "$isolate" "$in_dir" "$out_dir"
+	gff_modifier.pl "$in_dir/$isolate.gff" "$out_dir"
 	
 	gene_intergenic_coordinate_extracter.pl "$isolate" "$in_dir" "$out_dir"
 	
