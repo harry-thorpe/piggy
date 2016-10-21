@@ -2,6 +2,12 @@
 
 $in_file=$ARGV[0];
 
+if($in_file =~ /\/([^\/]+)\.gff/){
+	$in_base=$1;
+}else{
+	$in_base=$in_file;
+}
+
 open OUTPUT, ">$in_file.modified";
 
 $include=0;
@@ -32,5 +38,5 @@ while(<INPUT>){
 }
 print OUTPUT "\n";
 
-print "$in_file modified.\n";
+print "$in_base modified.\n";
 

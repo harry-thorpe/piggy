@@ -29,7 +29,7 @@ while(<INPUT_R>){
 				$gene_id=$line_array[$i];
 				$gene=$line_array[0];
 			
-				print "$isolate\n";
+				#print "$isolate\n";
 			
 				$gene_id_hash{$isolate}{$gene_id}=$gene;
 			}

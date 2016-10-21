@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
-$in_dir=$ARGV[0];
-$out_dir=$ARGV[1];
+$out_dir=$ARGV[0];
 
 open LOG, ">>$out_dir/log.txt";
 
@@ -40,4 +39,6 @@ while(<INPUT>){
 		}
 	}
 }
+
+close LOG;
 

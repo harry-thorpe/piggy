@@ -96,7 +96,7 @@ while(readdir $dh){
 				
 				print OUTPUT "$gene,$id_1,$id_2,$snps,$sites,$seq_1_len,$nuc_identity,$len_identity\n";
 			}else{
-				print "$gene\n";
+				#print "$gene\n";
 			}
 		}
 	}

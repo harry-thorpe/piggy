@@ -23,7 +23,7 @@ foreach $gene_pair(@gene_pair_array){
 	
 	$cluster_count=scalar(@cluster_array);
 	
-	print "$cluster_count";
+	#print "$cluster_count";
 	
 	if($cluster_count > 1){
 		for($i=0; $i<$cluster_count; $i++){
