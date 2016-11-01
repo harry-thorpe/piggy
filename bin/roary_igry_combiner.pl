@@ -75,7 +75,7 @@ while(<INPUT_I>){
 					@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
 					@tmp_gene_array=sort(@tmp_gene_array);
 			
-					$tmp_gene_1_2="$tmp_gene_array[0]_$tmp_gene_array[1]";
+					$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
 			
 					$int_gene_hash{$tmp_gene_1_2}++;
 				}

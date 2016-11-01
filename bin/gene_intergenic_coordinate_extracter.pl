@@ -36,7 +36,7 @@ while(<INPUT>){
 		
 			$len=(($end - $sta) + 1);
 		
-			if($line_array[8] =~ /ID=(${isolate}_[^;]+);/){
+			if($line_array[8] =~ /ID=([^;]+);/){
 				$id=$1;
 			}
 			if($line_array[8] =~ /gene=([^;]+);/){
