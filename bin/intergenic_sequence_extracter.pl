@@ -76,5 +76,6 @@ foreach $contig(@contig_array){
 	}
 }
 
-print "$isolate intergenic sequences extracted.\n";
+print STDOUT "$isolate intergenic sequences extracted.\n";
+print STDERR "$isolate intergenic sequences extracted.\n";
 

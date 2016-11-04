@@ -2,8 +2,6 @@
 
 $out_dir=$ARGV[0];
 
-open LOG, ">>$out_dir/log.txt";
-
 open OUTPUT, ">$out_dir/IGR_presence_absence.csv";
 
 open INPUT, "$out_dir/isolates.txt";
@@ -61,5 +59,6 @@ foreach $cluster(@cluster_array){
 	print OUTPUT "\n";
 }
 
-close LOG;
+print STDOUT "IGR presence absence matrix produced.\n"
+print STDERR "IGR presence absence matrix produced.\n"
 

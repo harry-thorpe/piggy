@@ -2,8 +2,6 @@
 
 $out_dir=$ARGV[0];
 
-open LOG, ">>$out_dir/log.txt";
-
 open OUTPUT, ">$out_dir/clusters.txt";
 
 mkdir "$out_dir/cluster_intergenic_files";
@@ -40,5 +38,6 @@ while(<INPUT>){
 	}
 }
 
-close LOG;
+print STDOUT "IGR cluster files created.\n";
+print STDERR "IGR cluster files created.\n";
 

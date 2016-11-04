@@ -181,5 +181,6 @@ for($i=0; $i<$gene_count; $i++){
 	}
 }
 
-print "$isolate gene intergenic coordinates extracted.\n";
+print STDOUT "$isolate gene intergenic coordinates extracted.\n";
+print STDERR "$isolate gene intergenic coordinates extracted.\n";
 
