@@ -59,6 +59,6 @@ foreach $cluster(@cluster_array){
 	print OUTPUT "\n";
 }
 
-print STDOUT "IGR presence absence matrix produced.\n"
-print STDERR "IGR presence absence matrix produced.\n"
+print STDOUT "IGR presence absence matrix produced.\n";
+print STDERR "IGR presence absence matrix produced.\n";
 
