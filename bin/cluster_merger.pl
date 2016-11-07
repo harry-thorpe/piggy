@@ -4,9 +4,14 @@ $in_file=$ARGV[0];
 $out_file=$ARGV[1];
 $out_dir=$ARGV[2];
 $cluster_file=$ARGV[3];
+$cluster_file_rep=$ARGV[4];
 
 if($in_file =~ /^(\S+)\.tab/){
 	$in_base=$1;
+}
+
+if($cluster_file_rep =~ /^(\S+)\.fasta/){
+	$cluster_file_rep_base=$1;
 }
 
 open OUTPUT, ">$out_file";
@@ -147,4 +152,27 @@ foreach $cluster(@total_cluster_array){
 		print OUTPUT_CLU "$cluster\n";
 	}
 }
+close OUTPUT_CLU;
+
+open OUTPUT_CLU_REP, ">${cluster_file_rep_base}_merged.fasta";
+
+open INPUT, $cluster_file_rep;
+while(<INPUT>){
+	$line=$_;
+	chomp $line;
+	
+	if($line =~ /^>(\S+)/){
+		$id=$1;
+		@id_array=split(/_\+_\+_/, $id);
+		
+		$cluster=$id_array[0];
+	}elsif($line =~ /^([ATGCN]+)/){
+		$seq=$1;
+		
+		if(!$remove_cluster_hash{$cluster}){
+			print OUTPUT_CLU_REP ">$id\n$seq\n";
+		}
+	}
+}
+close INPUT;
 

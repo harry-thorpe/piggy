@@ -137,7 +137,7 @@ blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative
 
 printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
 
-cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt"
+cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta"
 
 readarray -t cluster_array < "$out_dir/clusters.txt"
 
@@ -243,7 +243,9 @@ printf "Candidate switched IGR divergences calculated.\n" >> "$out_dir/log.txt";
 
 printf "Making R plots.\n"
 
-R_plotter.R "$out_dir"
+# Needs R, Rscript, ggplot2, cowplot, dplyr.
+
+R_plotter.R "$out_dir" > /dev/null
 
 # Cleanup
 
