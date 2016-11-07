@@ -11,34 +11,43 @@ while(<INPUT>){
 	
 	push @isolate_array, $line;
 }
+close INPUT;
 
-open INPUT, "$out_dir/output_fasta_clustered.fasta.clstr";
+open INPUT, "$out_dir/clusters.txt";
 while(<INPUT>){
 	$line=$_;
 	chomp $line;
 	
-	if($line =~ /^>(.+)/){
-		$cluster=$1;
-		$cluster=~s/ /_/g;
+	push @cluster_array, $line;
+}
+close INPUT;
+
+foreach $cluster(@cluster_array){
+	open INPUT, "$out_dir/cluster_intergenic_files/$cluster.fasta";
+	while(<INPUT>){
+		$line=$_;
+		chomp $line;
 	
-	}elsif($line =~ /^\d+\s+\d+nt,\s+\>(\S+)\.\.\./){
-		$cluster_id=$1;
-		@cluster_id_array=split(/_\+_\+_/, $cluster_id);
-		$isolate=$cluster_id_array[0];
-		
-		if(!$cluster_hash{$cluster}{$isolate}){
-			$cluster_isolate_count_hash{$cluster}++;
+		if($line =~ /^>(.+)/){
 			
-			$cluster_hash{$cluster}{$isolate}=$cluster_id;
-		}else{
-			$cluster_hash{$cluster}{$isolate}="$cluster_hash{$cluster}{$isolate}\t$cluster_id";
-		}
+			$cluster_id=$1;
+			@cluster_id_array=split(/_\+_\+_/, $cluster_id);
+			$isolate=$cluster_id_array[0];
 		
-		$cluster_seq_count_hash{$cluster}++;
+			if(!$cluster_hash{$cluster}{$isolate}){
+				$cluster_isolate_count_hash{$cluster}++;
+			
+				$cluster_hash{$cluster}{$isolate}=$cluster_id;
+			}else{
+				$cluster_hash{$cluster}{$isolate}="$cluster_hash{$cluster}{$isolate}\t$cluster_id";
+			}
+		
+			$cluster_seq_count_hash{$cluster}++;
+		}
 	}
 }
 
-@cluster_array=sort { $cluster_isolate_count_hash{$b} <=> $cluster_isolate_count_hash{$a} } keys %cluster_isolate_count_hash;
+@cluster_sorted_array=sort { $cluster_isolate_count_hash{$b} <=> $cluster_isolate_count_hash{$a} } keys %cluster_isolate_count_hash;
 
 print OUTPUT "Cluster,Isolates,Sequences";
 foreach $isolate(@isolate_array){
@@ -46,7 +55,7 @@ foreach $isolate(@isolate_array){
 }
 print OUTPUT "\n";
 
-foreach $cluster(@cluster_array){
+foreach $cluster(@cluster_sorted_array){
 	
 	print OUTPUT "$cluster,$cluster_isolate_count_hash{$cluster},$cluster_seq_count_hash{$cluster}";
 	foreach $isolate(@isolate_array){

@@ -129,120 +129,121 @@ fi
 
 cluster_file_creator.pl "$out_dir" >> "$out_dir/log.txt"
 
+printf "Doing all-vs-all IGR cluster search.\n" >> "$out_dir/log.txt";printf "Doing all-vs-all IGR cluster search.\n"
+
+makeblastdb -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl > /dev/null
+
+blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
+
+printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
+
+cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt"
+
 readarray -t cluster_array < "$out_dir/clusters.txt"
 
 cluster_count=${#cluster_array[@]}
 
-printf "%i IGR clusters found.\n" "$cluster_count" >> "$out_dir/log.txt";printf "%i IGR clusters found.\n" "$cluster_count"
+printf "%i IGR clusters found after merging.\n" "$cluster_count" >> "$out_dir/log.txt";printf "%i IGR clusters found after merging.\n" "$cluster_count"
 
-printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
+printf "Aligning IGR clusters...\n" >> "$out_dir/log.txt";printf "Aligning IGR clusters...\n"
 
-makeblastdb -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl
+for ((i = 0 ; i < $cluster_count ; i++))
+do	
+	cluster=${cluster_array[$i]}
+	
+	seq_count=$(awk '/^>/{a++}END{print a}' "$out_dir/cluster_intergenic_files/${cluster}.fasta")
+	
+	if [ "$seq_count" -gt 1 ]
+	then
+		mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
+		#mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
+		
+		fasta_converter.pl "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" "$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta"
+		
+		cp "$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta" "$out_dir/cluster_intergenic_alignment_files/${cluster}_aligned.fasta"
+	else
+		cp "$out_dir/cluster_intergenic_files/${cluster}.fasta" "$out_dir/cluster_intergenic_alignment_files/${cluster}_aligned.fasta"
+	fi
+	
+	rem=$(($i % 100))
+	if [ "$rem" -eq 0 ] && [ "$i" -gt 0 ]
+	then
+		printf "%i / %i IGR clusters aligned.\n" "$i" "$cluster_count"
+	fi
+done
 
-#for cluster in ${cluster_array[@]}
-#do
-	blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore"
-#done
+printf "IGR clusters aligned.\n" >> "$out_dir/log.txt";printf "IGR clusters aligned.\n"
 
-#printf "Aligning IGR clusters...\n" >> "$out_dir/log.txt";printf "Aligning IGR clusters...\n"
+printf "Producing IGR presence absence matrix...\n" >> "$out_dir/log.txt";printf "Producing IGR presence absence matrix...\n"
 
-#for ((i = 0 ; i < $cluster_count ; i++))
-#do	
-#	cluster=${cluster_array[$i]}
-#	
-#	seq_count=$(awk '/^>/{a++}END{print a}' "$out_dir/cluster_intergenic_files/${cluster}.fasta")
-#	
-#	if [ "$seq_count" -gt 1 ]
-#	then
-#		mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
-#		#mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
-#		
-#		fasta_converter.pl "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" "$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta"
-#		
-#		cp "$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta" "$out_dir/cluster_intergenic_alignment_files/${cluster}_aligned.fasta"
-#	else
-#		cp "$out_dir/cluster_intergenic_files/${cluster}.fasta" "$out_dir/cluster_intergenic_alignment_files/${cluster}_aligned.fasta"
-#	fi
-#	
-#	rem=$(($i % 100))
-#	if [ "$rem" -eq 0 ] && [ "$i" -gt 0 ]
-#	then
-#		printf "%i / %i IGR clusters aligned.\n" "$i" "$cluster_count"
-#	fi
-#done
+cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"
 
-#printf "IGR clusters aligned.\n" >> "$out_dir/log.txt";printf "IGR clusters aligned.\n"
+#printf "Calculating gene divergences...\n" >> "$out_dir/log.txt";printf "Calculating gene divergences...\n"
 
-#printf "Producing IGR presence absence matrix...\n" >> "$out_dir/log.txt";printf "Producing IGR presence absence matrix...\n"
+#divergence_checker.pl "$roary_dir/pan_genome_sequences" "$out_dir" "roary_gene_divergences.csv"
 
-#cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"
+#printf "Gene divergences calculated.\n" >> "$out_dir/log.txt";printf "Gene divergences calculated.\n"
 
-##printf "Calculating gene divergences...\n" >> "$out_dir/log.txt";printf "Calculating gene divergences...\n"
+#printf "Calculating IGR divergences...\n" >> "$out_dir/log.txt";printf "Calculating IGR divergences...\n"
 
-##divergence_checker.pl "$roary_dir/pan_genome_sequences" "$out_dir" "roary_gene_divergences.csv"
+#divergence_checker.pl "$out_dir/cluster_intergenic_alignment_files" "$out_dir" "igry_IGR_divergences.csv"
 
-##printf "Gene divergences calculated.\n" >> "$out_dir/log.txt";printf "Gene divergences calculated.\n"
+#printf "IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "IGR divergences calculated.\n"
 
-##printf "Calculating IGR divergences...\n" >> "$out_dir/log.txt";printf "Calculating IGR divergences...\n"
+printf "Combining gene and IGR matrices...\n" >> "$out_dir/log.txt";printf "Combining gene and IGR matrices...\n"
 
-##divergence_checker.pl "$out_dir/cluster_intergenic_alignment_files" "$out_dir" "igry_IGR_divergences.csv"
+roary_igry_combiner.pl "$out_dir" "$roary_dir" >> "$out_dir/log.txt"
 
-##printf "IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "IGR divergences calculated.\n"
+if [ ! -d "$out_dir/switched_region_files" ]
+then
+	mkdir "$out_dir/switched_region_files"
+fi
 
-#printf "Combining gene and IGR matrices...\n" >> "$out_dir/log.txt";printf "Combining gene and IGR matrices...\n"
+printf "Detecting candidate switched IGRs...\n" >> "$out_dir/log.txt";printf "Detecting candidate switched IGRs...\n"
 
-#roary_igry_combiner.pl "$out_dir" "$roary_dir" >> "$out_dir/log.txt"
+switched_region_creator.pl "$out_dir/roary_igry_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir"
 
-#if [ ! -d "$out_dir/switched_region_files" ]
-#then
-#	mkdir "$out_dir/switched_region_files"
-#fi
+printf "Candidate switched IGRs detected.\n" >> "$out_dir/log.txt";printf "Candidate switched IGRs detected.\n"
 
-#printf "Detecting candidate switched IGRs...\n" >> "$out_dir/log.txt";printf "Detecting candidate switched IGRs...\n"
+if [ ! -d "$out_dir/switched_region_alignment_files" ]
+then
+	mkdir "$out_dir/switched_region_alignment_files"
+fi
 
-#switched_region_creator.pl "$out_dir/roary_igry_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir"
+readarray -t switched_region_array < "$out_dir/switched_regions.txt"
 
-#printf "Candidate switched IGRs detected.\n" >> "$out_dir/log.txt";printf "Candidate switched IGRs detected.\n"
+printf "Aligning candidate switched IGRs...\n" >> "$out_dir/log.txt";printf "Aligning candidate switched IGRs...\n"
 
-#if [ ! -d "$out_dir/switched_region_alignment_files" ]
-#then
-#	mkdir "$out_dir/switched_region_alignment_files"
-#fi
+for switched_region in ${switched_region_array[@]}
+do
+	blastn -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -outfmt 6 -out "$out_dir/blast_out.tab"
+	
+	blast_hit=$(blast_parser.pl "$out_dir/blast_out.tab" "$out_dir/switched_region_files/${switched_region}.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta")
+	
+	rm "$out_dir/blast_out.tab"
+	
+	if [ "$blast_hit" = "hit" ]
+	then
+		#mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+		mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+	
+		fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"
+	fi
+	
+	cp "$out_dir/switched_region_files/${switched_region}_aligned.fasta" "$out_dir/switched_region_alignment_files/${switched_region}_aligned.fasta"
+done
 
-#readarray -t switched_region_array < "$out_dir/switched_regions.txt"
+printf "Candidate switched IGRs aligned.\n" >> "$out_dir/log.txt";printf "Candidate switched IGRs aligned.\n"
 
-#printf "Aligning candidate switched IGRs...\n" >> "$out_dir/log.txt";printf "Aligning candidate switched IGRs...\n"
+printf "Calculating candidate switched IGR divergences...\n" >> "$out_dir/log.txt";printf "Calculating candidate switched IGR divergences...\n"
 
-#for switched_region in ${switched_region_array[@]}
-#do
-#	blastn -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -outfmt 6 -out "$out_dir/blast_out.tab"
-#	
-#	blast_hit=$(blast_parser.pl "$out_dir/blast_out.tab" "$out_dir/switched_region_files/${switched_region}.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta")
-#	
-#	rm "$out_dir/blast_out.tab"
-#	
-#	if [ "$blast_hit" = "hit" ]
-#	then
-#		#mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
-#		mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
-#	
-#		fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"
-#	fi
-#	
-#	cp "$out_dir/switched_region_files/${switched_region}_aligned.fasta" "$out_dir/switched_region_alignment_files/${switched_region}_aligned.fasta"
-#done
+divergence_checker.pl "$out_dir/switched_region_alignment_files" "$out_dir" "switched_region_divergences.csv"
 
-#printf "Candidate switched IGRs aligned.\n" >> "$out_dir/log.txt";printf "Candidate switched IGRs aligned.\n"
+printf "Candidate switched IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "Candidate switched IGR divergences calculated.\n"
 
-#printf "Calculating candidate switched IGR divergences...\n" >> "$out_dir/log.txt";printf "Calculating candidate switched IGR divergences...\n"
+printf "Making R plots.\n"
 
-#divergence_checker.pl "$out_dir/switched_region_alignment_files" "$out_dir" "switched_region_divergences.csv"
-
-#printf "Candidate switched IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "Candidate switched IGR divergences calculated.\n"
-
-#printf "Making R plots.\n"
-
-#R_plotter.R "$out_dir"
+R_plotter.R "$out_dir"
 
 # Cleanup
 
