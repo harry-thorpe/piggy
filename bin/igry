@@ -133,7 +133,7 @@ printf "Doing all-vs-all IGR cluster search.\n" >> "$out_dir/log.txt";printf "Do
 
 makeblastdb -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl > /dev/null
 
-blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
+blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
 
 printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
 
@@ -224,8 +224,8 @@ do
 	
 	if [ "$blast_hit" = "hit" ]
 	then
-		#mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
-		mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+		mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+		#mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
 	
 		fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"
 	fi
@@ -245,7 +245,7 @@ printf "Making R plots.\n"
 
 # Needs R, Rscript, ggplot2, cowplot, dplyr.
 
-R_plotter.R "$out_dir" > /dev/null
+R_plotter.R "$out_dir" &> /dev/null
 
 # Cleanup
 
