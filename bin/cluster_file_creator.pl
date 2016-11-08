@@ -6,6 +6,7 @@ open OUTPUT, ">$out_dir/clusters.txt";
 
 open OUTPUT_REP, ">$out_dir/representative_clusters.fasta";
 
+$count=0;
 open INPUT, "$out_dir/output_fasta_clustered.fasta.clstr";
 while(<INPUT>){
 	$line=$_;
@@ -16,6 +17,12 @@ while(<INPUT>){
 		$cluster=~s/ /_/g;
 		
 		print OUTPUT "$cluster\n";
+		
+		$count++;
+		if($count % 1000 == 0){
+			print STDOUT "$count representative IGR cluster files created.\n";
+			print STDERR "$count representative IGR cluster files created.\n";
+		}
 		
 	}elsif($line =~ /^\d+\s+\d+nt,\s+\>(\S+)\.\.\./){
 		$cluster_id=$1;
@@ -43,10 +50,17 @@ while(<INPUT>){
 					print OUTPUT_CLU ">$cluster_id\n$line\n";
 				}
 			}
+			
+			close OUTPUT_CLU;
+			close OUTPUT_CLU_REP;
 		}
 	}
 }
 
+close OUTPUT;
+close OUTPUT_REP;
+
+$count=0;
 open INPUT, "$out_dir/output_fasta_clustered.fasta.clstr";
 while(<INPUT>){
 	$line=$_;
@@ -55,6 +69,12 @@ while(<INPUT>){
 	if($line =~ /^>(.+)/){
 		$cluster=$1;
 		$cluster=~s/ /_/g;
+		
+		$count++;
+		if($count % 1000 == 0){
+			print STDOUT "$count IGR cluster files created.\n";
+			print STDERR "$count IGR cluster files created.\n";
+		}
 		
 	}elsif($line =~ /^\d+\s+\d+nt,\s+\>(\S+)\.\.\./){
 		$cluster_id=$1;
@@ -76,6 +96,8 @@ while(<INPUT>){
 					print OUTPUT_CLU ">$cluster_id\n$line\n";
 				}
 			}
+			
+			close OUTPUT_CLU;
 		}
 	}
 }

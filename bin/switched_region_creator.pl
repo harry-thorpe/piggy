@@ -18,7 +18,7 @@ while(<INPUT>){
 @gene_pair_array=keys(%cluster_hash);
 
 foreach $gene_pair(@gene_pair_array){
-	@cluster_array=keys($cluster_hash{$gene_pair});
+	@cluster_array=keys(%{$cluster_hash{$gene_pair}});
 	@cluster_array=sort(@cluster_array);
 	
 	$cluster_count=scalar(@cluster_array);

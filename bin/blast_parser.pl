@@ -19,22 +19,27 @@ while(<INPUT>){
 
 @seq_header_array=keys(%seq_header_hash);
 @seq_header_array=sort(@seq_header_array);
+$seq_header_count=scalar(@seq_header_array);
 
 $hits=0;
-open INPUT, $in_blast_file;
-while(<INPUT>){
-	$line=$_;
-	chomp $line;
-	@line_array=split(/\s+/, $line);
-
-	if($line_array[0] eq $seq_header_array[0] && $line_array[1] eq $seq_header_array[1]){
-		$hits++;
+if($seq_header_count > 1){
+	open INPUT, $in_blast_file;
+	while(<INPUT>){
+		$line=$_;
+		chomp $line;
+		@line_array=split(/\s+/, $line);
+	
+		if($line_array[0] eq $seq_header_array[0] && $line_array[1] eq $seq_header_array[1]){
+			$hits++;
+		}
 	}
 }
 
 if($hits > 0){
 	print STDOUT "hit";
 }else{
+	print STDOUT "no_hit";
+	
 	open FASTA, "$in_file";
 	while(<FASTA>){
 		$line=$_;

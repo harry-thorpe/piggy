@@ -7,6 +7,7 @@ $out_dir=$ARGV[3];
 $out_iso_dir=$ARGV[4];
 
 $min_len=30;
+$max_n_prop=0.1;
 
 open OUTPUT, ">>$out_dir/output_fasta.fasta";
 
@@ -66,10 +67,16 @@ foreach $contig(@contig_array){
 						$base=substr($contig_seq, $x, 1);
 						$int_seq=$int_seq.$base;
 					}
-					print OUTPUT ">$int_id\n$int_seq\n";
 					
-					open OUTPUT_ISOLATE, ">$out_iso_dir/$int_id.fasta";
-					print OUTPUT_ISOLATE ">$int_id\n$int_seq\n";
+					$n_count=$int_seq=~tr/N/N/;
+					$n_prop=($n_count/$len);
+					
+					if($n_prop < $max_n_prop){
+						print OUTPUT ">$int_id\n$int_seq\n";
+					
+						open OUTPUT_ISOLATE, ">$out_iso_dir/$int_id.fasta";
+						print OUTPUT_ISOLATE ">$int_id\n$int_seq\n";
+					}
 				}
 			}
 		}

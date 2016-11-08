@@ -127,11 +127,15 @@ then
 	mkdir "$out_dir/cluster_representative_files"
 fi
 
+printf "Creating IGR cluster files...\n" >> "$out_dir/log.txt";printf "Creating IGR cluster files...\n"
+
 cluster_file_creator.pl "$out_dir" >> "$out_dir/log.txt"
+
+#printf "IGR cluster fasta files created.\n" >> "$out_dir/log.txt";printf "IGR cluster fasta files created.\n"
 
 printf "Doing all-vs-all IGR cluster search.\n" >> "$out_dir/log.txt";printf "Doing all-vs-all IGR cluster search.\n"
 
-makeblastdb -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl > /dev/null
+makeblastdb -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl -max_file_size "10GB" > /dev/null
 
 blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
 
@@ -155,8 +159,8 @@ do
 	
 	if [ "$seq_count" -gt 1 ]
 	then
-		mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
-		#mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
+		mafft --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
+		#mafft --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
 		
 		fasta_converter.pl "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" "$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta"
 		
@@ -224,8 +228,8 @@ do
 	
 	if [ "$blast_hit" = "hit" ]
 	then
-		mafft --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
-		#mafft --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+		mafft --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+		#mafft --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
 	
 		fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"
 	fi
