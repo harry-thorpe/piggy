@@ -2,6 +2,9 @@
 
 $out_dir=$ARGV[0];
 
+print STDOUT "Creating IGR cluster files.\n";
+print STDERR "Creating IGR cluster files.\n";
+
 open OUTPUT, ">$out_dir/clusters.txt";
 
 open OUTPUT_REP, ">$out_dir/representative_clusters.fasta";
@@ -88,13 +91,16 @@ while(<INPUT>){
 			open INPUT_CLU, "$out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta";
 			while(<INPUT_CLU>){
 				$line=$_;
-				chomp $line;
-			
-				if($line =~ /^>(.+)/){
-			
-				}else{
-					print OUTPUT_CLU ">$cluster_id\n$line\n";
-				}
+				
+				print OUTPUT_CLU "$line";
+				
+#				chomp $line;
+#			
+#				if($line =~ /^>(.+)/){
+#			
+#				}else{
+#					print OUTPUT_CLU ">$cluster_id\n$line\n";
+#				}
 			}
 			
 			close OUTPUT_CLU;
