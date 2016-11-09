@@ -43,7 +43,8 @@
 # }
 
 #####
-library(cowplot)
+#library(cowplot)
+library(ggplot2)
 library(reshape2)
 
 # roary_gene_divergences <- read.csv("/media/harry/extra/igry_test/roary_gene_divergences.csv")
