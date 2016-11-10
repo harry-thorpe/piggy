@@ -22,7 +22,7 @@ while(<INPUT>){
 	$id="";
 	$gene="";
 	if($line !~ /^##/){
-		if($line_array[2] ne "sig_peptide" && $line_array[2] ne "misc_RNA" && $line_array[2] ne "repeat_region"){
+		if($line_array[2] eq "CDS" || $line_array[2] eq "rRNA" || $line_array[2] eq "tRNA"){
 			$contig=$line_array[0];
 			$sta=$line_array[3];
 			$end=$line_array[4];

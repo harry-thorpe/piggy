@@ -7,6 +7,7 @@ $out_dir=$ARGV[3];
 $out_iso_dir=$ARGV[4];
 
 $min_len=30;
+$max_len=1000;
 $max_n_prop=0.1;
 
 open OUTPUT, ">>$out_dir/output_fasta.fasta";
@@ -58,7 +59,7 @@ foreach $contig(@contig_array){
 		if($line !~ /^Name\tGene_name\tStart\tEnd\tLength\tType/){
 			if($contig eq $contig_id){
 				
-				if($len >= $min_len){
+				if($len >= $min_len && $len <= $max_len){
 					$ind_sta=($sta-1);
 					$ind_end=($end-1);
 					
