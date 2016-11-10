@@ -49,20 +49,21 @@ foreach $cluster(@cluster_array){
 
 @cluster_sorted_array=sort { $cluster_isolate_count_hash{$b} <=> $cluster_isolate_count_hash{$a} } keys %cluster_isolate_count_hash;
 
-print OUTPUT "Cluster,Isolates,Sequences";
+print OUTPUT "\"Gene\",\"Non-unique Gene name\",\"Annotation\",\"No. isolates\",\"No. sequences\",\"Avg sequences per isolate\",\"Genome Fragment\",\"Order within Fragment\",\"Accessory Fragment\",\"Accessory Order with Fragment\",\"QC\",\"Min group size nuc\",\"Max group size nuc\",\"Avg group size nuc\"";
 foreach $isolate(@isolate_array){
-	print OUTPUT ",$isolate";
+	print OUTPUT ",\"$isolate\"";
 }
 print OUTPUT "\n";
 
 foreach $cluster(@cluster_sorted_array){
+	$ave_seqs=($cluster_seq_count_hash{$cluster}/$cluster_isolate_count_hash{$cluster});
 	
-	print OUTPUT "$cluster,$cluster_isolate_count_hash{$cluster},$cluster_seq_count_hash{$cluster}";
+	print OUTPUT "\"$cluster\",\"\",\"\",\"$cluster_isolate_count_hash{$cluster}\",\"$cluster_seq_count_hash{$cluster}\",\"$ave_seqs\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"";
 	foreach $isolate(@isolate_array){
 		if($cluster_hash{$cluster}{$isolate}){
-			print OUTPUT ",$cluster_hash{$cluster}{$isolate}";
+			print OUTPUT ",\"$cluster_hash{$cluster}{$isolate}\"";
 		}else{
-			print OUTPUT ",";
+			print OUTPUT ",\"\"";
 		}
 	}
 	print OUTPUT "\n";
