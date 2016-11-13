@@ -43,8 +43,8 @@
 # }
 
 #####
-#library(cowplot)
 library(ggplot2)
+library(cowplot)
 library(reshape2)
 
 # roary_gene_divergences <- read.csv("/media/harry/extra/igry_test/roary_gene_divergences.csv")
@@ -134,22 +134,24 @@ switched_region_divergences <- read.csv(file=in_file, header=TRUE)
 # ggplot(switched_region_divergences_len_summary, aes(x=Length_identity)) +
 #   geom_histogram(binwidth=0.01)
 
-# switched_region_divergences_long <- melt(switched_region_divergences, id.vars="Gene", measure.vars=c("Length_identity", "Nuc_identity"))
-# 
-# sr_div_hist <- ggplot(switched_region_divergences_long, aes(x=value)) +
-#   geom_histogram(binwidth=0.005) +
-#   scale_x_continuous(limits=c(0,1.01)) +
-#   labs(x="Identity", y="Count") +
-#   facet_grid(variable~., scales="free")
-# 
-# tiff("/media/harry/extra/igry_test/figures/sr_div_hist.tif", height=5, width=10, units="in", res=100)
-# 
-# sr_div_hist
-# 
-# dev.off()
+switched_region_divergences_long <- melt(switched_region_divergences, id.vars="Gene", measure.vars=c("Length_identity", "Nuc_identity"))
+
+sr_div_hist <- ggplot(switched_region_divergences_long, aes(x=value)) +
+  geom_histogram(binwidth=0.005) +
+  geom_vline(xintercept=0.9, linetype="dashed", colour="red") +
+  labs(x="Identity", y="Count") +
+  facet_grid(variable~., scales="free")
+
+out_file=paste(out_dir, "/switched_region_divergences_hist.tif", sep="")
+
+tiff(filename=out_file, height=5, width=10, units="in", res=100)
+
+sr_div_hist
+
+dev.off()
 
 sr_div_point <- ggplot(switched_region_divergences, aes(x=Length_identity, y=Nuc_identity)) +
-  geom_point() +
+  geom_point(alpha=0.1) +
   geom_hline(yintercept=0.9, linetype="dashed", colour="red") +
   geom_vline(xintercept=0.9, linetype="dashed", colour="red") +
   labs(x="Length identity", y="Nucleotide identity")
