@@ -15,9 +15,11 @@ while(readdir $dh){
 		$gene=$1;
 	}
 	
-	@id_array=();
-	%id_hash=();
+	$nuc_identity_sum=0;
+	$len_identity_sum=0;
+	$comp=0;
 	
+	$count=0;
 	open INPUT, "$in_dir/$file";
 	while(<INPUT>){
 		$line=$_;
@@ -25,80 +27,67 @@ while(readdir $dh){
 		
 		if($line =~ /^>(.+)/){
 			$id=$1;
-			
-			push @id_array, $id;
 		}else{
+			$count++;
+			
 			$seq=$line;
-			$seq=~tr/a-z/A-Z/;
-			
-			if(!$id_hash{$id}){
-				$id_hash{$id}=$seq;
-			}else{
-				$id_hash{$id}=$id_hash{$id}.$seq;
-			}
-		}
-	}
-	
-	$id_count=scalar(@id_array);
-	
-	for($i=0; $i<$id_count; $i++){
-		$id_1=$id_array[$i];
-		
-		$seq_1=$id_hash{$id_1};
-		@seq_1_array=split(//, $seq_1);
-		
-		$seq_1_len=scalar(@seq_1_array);
-		
-		for($j=($i+1); $j<$id_count; $j++){
-			$id_2=$id_array[$j];
-		
-			$seq_2=$id_hash{$id_2};
-			@seq_2_array=split(//, $seq_2);
-			
-			$seq_2_len=scalar(@seq_2_array);
+			@seq_array=split(//, $seq);
+			$seq_len=scalar(@seq_array);
 			
 			$sites=0;
 			$snps=0;
 			$nuc_identity=0;
 			$len_identity=0;
-			$seq_1_sites=0;
-			$seq_2_sites=0;
+			$ref_seq_sites=0;
+			$seq_sites=0;
 			
-			if($seq_1_len == $seq_2_len){
-				for($pos=0; $pos<$seq_1_len; $pos++){
-					if($seq_1_array[$pos] ne "-"){
-						$seq_1_sites++;
-					}
-					if($seq_2_array[$pos] ne "-"){
-						$seq_2_sites++;
-					}
+			if($count == 1){
+				$ref_seq=$seq;
+				@ref_seq_array=split(//, $ref_seq);
+				$ref_seq_len=scalar(@ref_seq_array);
+				$ref_id=$id;
+			}else{
+				if($ref_seq_len == $seq_len){
 					
-					if($seq_1_array[$pos] ne "-" && $seq_2_array[$pos] ne "-"){
-						$sites++;
-						if($seq_1_array[$pos] ne $seq_2_array[$pos]){
-							$snps++;
+					$comp=1;
+					for($pos=0; $pos<$ref_seq_len; $pos++){
+						if($ref_seq_array[$pos] ne "-"){
+							$ref_seq_sites++;
+						}
+						if($seq_array[$pos] ne "-"){
+							$seq_sites++;
+						}
+					
+						if($ref_seq_array[$pos] ne "-" && $seq_array[$pos] ne "-"){
+							$sites++;
+							if($ref_seq_array[$pos] ne $seq_array[$pos]){
+								$snps++;
+							}
 						}
 					}
-				}
-			}else{
-				print "bad sequences\n";
-			}
-			
-			if($sites > 0){
-				$nuc_identity=($snps/$sites);
-				$nuc_identity=(1-$nuc_identity);
-				
-				if($seq_1_sites > $seq_2_sites){
-					$len_identity=($sites/$seq_1_len);
+					
+					if($sites > 0){
+						$nuc_identity=($snps/$sites);
+						$nuc_identity=(1-$nuc_identity);
+						
+						$len_identity=($sites/$ref_seq_len);
+						
+						$nuc_identity_sum+=$nuc_identity;
+						$len_identity_sum+=$len_identity;
+					}
 				}else{
-					$len_identity=($sites/$seq_2_len);
+					print "bad sequences\n";
 				}
-				
-				print OUTPUT "$gene,$id_1,$id_2,$snps,$sites,$seq_1_len,$nuc_identity,$len_identity\n";
-			}else{
-				print OUTPUT "$gene,$id_1,$id_2,$snps,$sites,$seq_1_len,0,0\n";
 			}
 		}
+	}
+	
+	if($comp == 1){
+		$comp_count=$count-1;
+		$nuc_identity=$nuc_identity_sum/$comp_count;
+		$len_identity=$len_identity_sum/$comp_count;
+	
+		print OUTPUT "$gene,$ref_id,$id,$snps,$sites,$ref_seq_len,$nuc_identity,$len_identity\n";
 	}
 }
 

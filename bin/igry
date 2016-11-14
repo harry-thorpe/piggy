@@ -184,11 +184,11 @@ cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"
 
 #printf "Gene divergences calculated.\n" >> "$out_dir/log.txt";printf "Gene divergences calculated.\n"
 
-#printf "Calculating IGR divergences...\n" >> "$out_dir/log.txt";printf "Calculating IGR divergences...\n"
+printf "Calculating IGR divergences...\n" >> "$out_dir/log.txt";printf "Calculating IGR divergences...\n"
 
-#divergence_checker.pl "$out_dir/cluster_intergenic_alignment_files" "$out_dir" "igry_IGR_divergences.csv"
+divergence_checker.pl "$out_dir/cluster_intergenic_alignment_files" "$out_dir" "cluster_IGR_divergences.csv"
 
-#printf "IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "IGR divergences calculated.\n"
+printf "IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "IGR divergences calculated.\n"
 
 printf "Combining gene and IGR matrices...\n" >> "$out_dir/log.txt";printf "Combining gene and IGR matrices...\n"
 
@@ -243,7 +243,7 @@ printf "Candidate switched IGR divergences calculated.\n" >> "$out_dir/log.txt";
 
 printf "Making R plots.\n"
 
-# Needs R, Rscript, ggplot2, cowplot, dplyr.
+# Needs R, Rscript, ggplot2, cowplot, reshape2.
 
 R_plotter.R "$out_dir" &> /dev/null
 
