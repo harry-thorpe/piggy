@@ -10,6 +10,7 @@ igry
  -o output directory (default - current directory/igry_out)
  -t threads (default 1)
  -r roary output directory
+ -R Make R plots (Needs R, Rscript, ggplot2, cowplot, reshape2) (default - off)
  -h help
 
 EOF
@@ -24,6 +25,7 @@ fi
 in_dir=$(pwd)
 out_dir="$in_dir/igry_out"
 threads=1
+R_plots=0;
 
 while getopts "i: o: t: r: h" opt; do
  	case "$opt" in
@@ -31,6 +33,7 @@ while getopts "i: o: t: r: h" opt; do
 		o) out_dir=$OPTARG;;
 		t) threads=$OPTARG;;
 		r) roary_dir=$OPTARG;;
+		R) R_plots=1;;
 		h) usage;exit;;
 	esac
 done
@@ -241,11 +244,14 @@ divergence_checker.pl "$out_dir/switched_region_alignment_files" "$out_dir" "swi
 
 printf "Candidate switched IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "Candidate switched IGR divergences calculated.\n"
 
-printf "Making R plots.\n"
+if [ "$R_plots" -eq 1 ]
+then
+	printf "Making R plots.\n"
 
-# Needs R, Rscript, ggplot2, cowplot, reshape2.
+	# Needs R, Rscript, ggplot2, cowplot, reshape2.
 
-R_plotter.R "$out_dir" &> /dev/null
+	R_plotter.R "$out_dir" "0.9" &> /dev/null
+fi
 
 # Cleanup
 
