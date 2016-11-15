@@ -6,11 +6,12 @@ cat << EOF
 
 igry
 
- -i input directory (default - current directory)
- -o output directory (default - current directory/igry_out)
- -t threads (default 1)
- -r roary output directory
- -R Make R plots (Needs R, Rscript, ggplot2, cowplot, reshape2) (default - off)
+ -i input directory [default - current directory]
+ -o output directory [default - current directory/igry_out]
+ -t threads [default - 1]
+ -r roary output directory [required]
+ -s percentage sequence similarity threshold [default - 90]
+ -R Make R plots (Needs R, Rscript, ggplot2, cowplot, reshape2) [default - off]
  -h help
 
 EOF
@@ -22,25 +23,56 @@ then
 	exit
 fi
 
-in_dir=$(pwd)
-out_dir="$in_dir/igry_out"
-threads=1
-R_plots=0;
-
-while getopts "i: o: t: r: h" opt; do
+while getopts "i: o: t: r: s: R h" opt; do
  	case "$opt" in
 		i) in_dir=$OPTARG;;
 		o) out_dir=$OPTARG;;
 		t) threads=$OPTARG;;
 		r) roary_dir=$OPTARG;;
+		s) similarity_threshold=$OPTARG;;
 		R) R_plots=1;;
 		h) usage;exit;;
 	esac
 done
 
+# Check options and set defaults.
+if [ -z "$in_dir" ]
+then
+	in_dir=$(pwd)
+fi
+
+if [ -z "$out_dir" ]
+then
+	out_dir="$in_dir/igry_out"
+fi
+
+if [ -z "$threads" ]
+then
+	threads=1
+fi
+
+if [ -z "$roary_dir" ]
+then
+	printf "No Roary output directory specified.\n"
+	exit
+fi
+
+if [ -z "$similarity_threshold" ]
+then
+	similarity_threshold=0.9
+else
+	similarity_threshold=$(echo "print $similarity_threshold / 100" | perl)
+fi
+
+if [ -z "$R_plots" ]
+then
+	R_plots=0
+fi
+
 if [ ! -d "$in_dir" ]
 then
 	printf "Input folder doesn't exist.\n"
+	exit
 fi
 
 if [ ! -d "$out_dir" ]
@@ -52,8 +84,6 @@ then
 		printf "Created output folder $out_dir\n"
 	fi
 fi
-
-printf "" > "$out_dir/log.txt"
 
 file_array=("$in_dir/*.gff")
 
@@ -70,7 +100,15 @@ done
 
 isolate_count=${#isolate_array[@]}
 
-printf "$isolate_count isolates found.\n"
+if [ "$isolate_count" -gt 0 ]
+then
+	printf "$isolate_count isolates found.\n"
+else
+	printf "$isolate_count isolates found in the input folder.\n"
+	exit
+fi	
+
+printf "" > "$out_dir/log.txt"
 
 printf "" >  "$out_dir/isolates.txt"
 
@@ -109,7 +147,7 @@ done
 
 printf "Clustering IGRs...\n" >> "$out_dir/log.txt";printf "Clustering IGRs...\n"
 
-cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -c 0.9 -T "$threads" -n 10 -d 0 -s 0.9 -g 0 -r 1 -mask N &> /dev/null
+cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -c "$similarity_threshold" -T "$threads" -n 10 -d 0 -s "$similarity_threshold" -g 0 -r 1 -mask N &> /dev/null
 
 rm "$out_dir/output_fasta_clustered.fasta"
 
@@ -140,7 +178,7 @@ blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative
 
 printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
 
-cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta"
+cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta" "$similarity_threshold"
 
 readarray -t cluster_array < "$out_dir/clusters.txt"
 
@@ -192,6 +230,8 @@ printf "Calculating IGR divergences...\n" >> "$out_dir/log.txt";printf "Calculat
 divergence_checker.pl "$out_dir/cluster_intergenic_alignment_files" "$out_dir" "cluster_IGR_divergences.csv"
 
 printf "IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "IGR divergences calculated.\n"
+
+core_alignment_creator.pl "$out_dir" >> "$out_dir/log.txt"
 
 printf "Combining gene and IGR matrices...\n" >> "$out_dir/log.txt";printf "Combining gene and IGR matrices...\n"
 
@@ -250,7 +290,7 @@ then
 
 	# Needs R, Rscript, ggplot2, cowplot, reshape2.
 
-	R_plotter.R "$out_dir" "0.9" &> /dev/null
+	R_plotter.R "$out_dir" "$similarity_threshold" &> /dev/null
 fi
 
 # Cleanup

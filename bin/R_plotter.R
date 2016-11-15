@@ -1,9 +1,14 @@
 #!/usr/bin/Rscript
 
+is.installed <- function(mypkg) is.element(mypkg, installed.packages()[,1]) 
+
 #####
 library(ggplot2)
-library(cowplot)
 library(reshape2)
+
+if(is.installed("cowplot") == TRUE){
+  library(cowplot)
+}
 
 args <- commandArgs(trailingOnly=TRUE)
 
