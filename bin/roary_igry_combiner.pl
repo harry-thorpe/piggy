@@ -73,7 +73,9 @@ while(<INPUT_I>){
 		for($i=$isolate_sta; $i<=$isolate_end; $i++){
 			if($line_array[$i]){
 				$isolate=$header_array[$i];
-				$int_id=$line_array[$i];
+				if($line_array[$i] =~ /^(\S+)/){
+					$int_id=$1;
+				}
 				$int=$line_array[0];
 				
 				#$int_id_hash{$isolate}{$int_id}=$int;
@@ -84,13 +86,26 @@ while(<INPUT_I>){
 				
 					$tmp_gene_1=$gene_id_hash{$isolate}{$int_id_array[1]};
 					$tmp_gene_2=$gene_id_hash{$isolate}{$int_id_array[2]};
-				
-					@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
-					@tmp_gene_array=sort(@tmp_gene_array);
+					
+					if(1 == 0){
+					
+						@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
+						@tmp_gene_array=sort(@tmp_gene_array);
 			
-					$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
+						$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
 			
-					$int_gene_hash{$tmp_gene_1_2}++;
+						$int_gene_hash{$tmp_gene_1_2}++;					
+					}elsif(1 == 1){
+					
+						if($int_id_array[3] eq "CO_F"){
+							$int_gene_hash{$tmp_gene_2}++;
+						}elsif($int_id_array[3] eq "CO_R"){
+							$int_gene_hash{$tmp_gene_1}++;
+						}elsif($int_id_array[3] eq "DP"){
+							$int_gene_hash{$tmp_gene_1}++;
+							$int_gene_hash{$tmp_gene_2}++;
+						}
+					}
 				}
 			}
 		}

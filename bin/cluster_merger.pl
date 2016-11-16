@@ -5,7 +5,8 @@ $out_file=$ARGV[1];
 $out_dir=$ARGV[2];
 $cluster_file=$ARGV[3];
 $cluster_file_rep=$ARGV[4];
-$similarity_threshold=$ARGV[5];
+$nuc_identity=$ARGV[5];
+$len_identity=$ARGV[6];
 
 if($in_file =~ /^(\S+)\.tab/){
 	$in_base=$1;
@@ -74,7 +75,7 @@ while(<INPUT>){
 				$match_len_total=scalar(@match_array);
 				$match_pcn_total=($match_len_total/$cluster_1_len);
 		
-				if($match_pcn_total >= $similarity_threshold){
+				if($match_pcn_total >= $len_identity){
 					if(!$merged_hash{$cluster}){
 						push @merge_cluster_array, $cluster;
 						
@@ -138,7 +139,7 @@ while(<INPUT>){
 			$cluster_2="$cluster_header$cluster_2_no";
 		}
 	
-		if($cluster_1 ne $cluster_2 && $match_pcn >= $similarity_threshold && $cluster_1_no < $cluster_2_no){
+		if($cluster_1 ne $cluster_2 && $match_pcn >= $nuc_identity && $cluster_1_no < $cluster_2_no){
 			for($i=$match_sta; $i<=$match_end; $i++){
 				$match_hash{$cluster_2}{$i}=1;
 			}

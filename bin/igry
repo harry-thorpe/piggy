@@ -10,7 +10,8 @@ igry
  -o output directory [default - current directory/igry_out]
  -t threads [default - 1]
  -r roary output directory [required]
- -s percentage sequence similarity threshold [default - 90]
+ -n minimum percentage nucleotide identity [default - 90]
+ -l minimum percentage length identity [default - 90]
  -R Make R plots (Needs R, Rscript, ggplot2, cowplot, reshape2) [default - off]
  -h help
 
@@ -23,13 +24,14 @@ then
 	exit
 fi
 
-while getopts "i: o: t: r: s: R h" opt; do
+while getopts "i: o: t: r: n: l: R h" opt; do
  	case "$opt" in
 		i) in_dir=$OPTARG;;
 		o) out_dir=$OPTARG;;
 		t) threads=$OPTARG;;
 		r) roary_dir=$OPTARG;;
-		s) similarity_threshold=$OPTARG;;
+		n) nuc_identity=$OPTARG;;
+		l) len_identity=$OPTARG;;
 		R) R_plots=1;;
 		h) usage;exit;;
 	esac
@@ -57,11 +59,18 @@ then
 	exit
 fi
 
-if [ -z "$similarity_threshold" ]
+if [ -z "$nuc_identity" ]
 then
-	similarity_threshold=0.9
+	nuc_identity=0.9
 else
-	similarity_threshold=$(echo "print $similarity_threshold / 100" | perl)
+	nuc_identity=$(echo "print $nuc_identity / 100" | perl)
+fi
+
+if [ -z "$len_identity" ]
+then
+	len_identity=0.9
+else
+	len_identity=$(echo "print $len_identity / 100" | perl)
 fi
 
 if [ -z "$R_plots" ]
@@ -147,7 +156,7 @@ done
 
 printf "Clustering IGRs...\n" >> "$out_dir/log.txt";printf "Clustering IGRs...\n"
 
-cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -c "$similarity_threshold" -T "$threads" -n 10 -d 0 -s "$similarity_threshold" -g 0 -r 1 -mask N &> /dev/null
+cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aL "$len_identity" -g 0 -r 1 -mask N &> /dev/null
 
 rm "$out_dir/output_fasta_clustered.fasta"
 
@@ -178,7 +187,7 @@ blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative
 
 printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
 
-cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta" "$similarity_threshold"
+cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta" "$nuc_identity" "$len_identity"
 
 readarray -t cluster_array < "$out_dir/clusters.txt"
 
@@ -290,7 +299,7 @@ then
 
 	# Needs R, Rscript, ggplot2, cowplot, reshape2.
 
-	R_plotter.R "$out_dir" "$similarity_threshold" &> /dev/null
+	R_plotter.R "$out_dir" "$nuc_identity" "$len_identity" &> /dev/null
 fi
 
 # Cleanup
