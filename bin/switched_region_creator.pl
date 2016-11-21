@@ -4,6 +4,9 @@ $in_file=$ARGV[0];
 $in_dir=$ARGV[1];
 $out_dir=$ARGV[2];
 
+print STDOUT "Detecting candidate switched IGRs...\n";
+print STDERR "Detecting candidate switched IGRs...\n";
+
 open OUTPUT_SR, ">$out_dir/switched_regions.txt";
 
 open INPUT, $in_file;
@@ -77,4 +80,7 @@ foreach $gene_pair(@gene_pair_array){
 		}
 	}
 }
+
+print STDOUT "Candidate switched IGRs detected.\n";
+print STDERR "Candidate switched IGRs detected.\n";
 

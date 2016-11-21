@@ -224,8 +224,6 @@ done
 
 printf "IGR clusters aligned.\n" >> "$out_dir/log.txt";printf "IGR clusters aligned.\n"
 
-printf "Producing IGR presence absence matrix...\n" >> "$out_dir/log.txt";printf "Producing IGR presence absence matrix...\n"
-
 cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"
 
 #printf "Calculating gene divergences...\n" >> "$out_dir/log.txt";printf "Calculating gene divergences...\n"
@@ -242,8 +240,6 @@ printf "IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "IGR diverge
 
 core_alignment_creator.pl "$out_dir" >> "$out_dir/log.txt"
 
-printf "Combining gene and IGR matrices...\n" >> "$out_dir/log.txt";printf "Combining gene and IGR matrices...\n"
-
 roary_igry_combiner.pl "$out_dir" "$roary_dir" >> "$out_dir/log.txt"
 
 if [ ! -d "$out_dir/switched_region_files" ]
@@ -251,11 +247,7 @@ then
 	mkdir "$out_dir/switched_region_files"
 fi
 
-printf "Detecting candidate switched IGRs...\n" >> "$out_dir/log.txt";printf "Detecting candidate switched IGRs...\n"
-
 switched_region_creator.pl "$out_dir/roary_igry_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir"
-
-printf "Candidate switched IGRs detected.\n" >> "$out_dir/log.txt";printf "Candidate switched IGRs detected.\n"
 
 if [ ! -d "$out_dir/switched_region_alignment_files" ]
 then

@@ -2,6 +2,9 @@
 
 $out_dir=$ARGV[0];
 
+print STDOUT "Producing IGR presence absence matrix...\n";
+print STDERR "Producing IGR presence absence matrix...\n";
+
 open OUTPUT, ">$out_dir/IGR_presence_absence.csv";
 
 open INPUT, "$out_dir/isolates.txt";
