@@ -90,7 +90,7 @@ while(<INPUT_I>){
 					$tmp_gene_1=$gene_id_hash{$isolate}{$int_id_array[1]};
 					$tmp_gene_2=$gene_id_hash{$isolate}{$int_id_array[2]};
 					
-					if(1 == 0){
+					if(1 == 1){
 					
 						@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
 						@tmp_gene_array=sort(@tmp_gene_array);
@@ -98,7 +98,7 @@ while(<INPUT_I>){
 						$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
 			
 						$int_gene_hash{$tmp_gene_1_2}++;					
-					}elsif(1 == 1){
+					}elsif(1 == 0){
 					
 						if($int_id_array[3] eq "CO_F"){
 							$int_gene_hash{$tmp_gene_2}++;
