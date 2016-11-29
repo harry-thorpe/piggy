@@ -13,6 +13,7 @@ igry
  -n minimum percentage nucleotide identity [default - 90]
  -l minimum percentage length identity [default - 90]
  -R Make R plots (Needs R, Rscript, ggplot2, cowplot, reshape2) [default - off]
+ -f Fast mode (doesn't align IGRs, detect switched regions, or make plots) [default - off]
  -h help
 
 EOF
@@ -24,7 +25,7 @@ then
 	exit
 fi
 
-while getopts "i: o: t: r: n: l: R h" opt; do
+while getopts "i: o: t: r: n: l: R f h" opt; do
  	case "$opt" in
 		i) in_dir=$OPTARG;;
 		o) out_dir=$OPTARG;;
@@ -33,6 +34,7 @@ while getopts "i: o: t: r: n: l: R h" opt; do
 		n) nuc_identity=$OPTARG;;
 		l) len_identity=$OPTARG;;
 		R) R_plots=1;;
+		f) fast=1;;
 		h) usage;exit;;
 	esac
 done
@@ -76,6 +78,11 @@ fi
 if [ -z "$R_plots" ]
 then
 	R_plots=0
+fi
+
+if [ -z "$fast" ]
+then
+	fast=0
 fi
 
 if [ ! -d "$in_dir" ]
@@ -141,22 +148,29 @@ then
 	mkdir "$out_dir/isolate_intergenic_files"
 fi
 
+if [ ! -d "$out_dir/gff_files" ]
+then
+	mkdir "$out_dir/gff_files"
+fi
+
 for isolate in ${isolate_array[@]}
 do
-	gff_modifier.pl "$in_dir/$isolate.gff" >> "$out_dir/log.txt"
+	cp "$in_dir/$isolate.gff" "$out_dir/gff_files"
 	
-	gene_intergenic_coordinate_extracter.pl "$isolate" "$in_dir/$isolate.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt"
+	gff_modifier.pl "$out_dir/gff_files/$isolate.gff" >> "$out_dir/log.txt"
+	
+	gene_intergenic_coordinate_extracter.pl "$isolate" "$out_dir/gff_files/$isolate.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt"
 	
 	if [ ! -d "$out_dir/isolate_intergenic_files/$isolate" ]; then
 		mkdir "$out_dir/isolate_intergenic_files/$isolate"
 	fi
 	
-	intergenic_sequence_extracter.pl "$isolate" "$in_dir/$isolate.gff.modified" "$out_dir/coordinate_files/${isolate}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/$isolate" >> "$out_dir/log.txt"
+	intergenic_sequence_extracter.pl "$isolate" "$out_dir/gff_files/$isolate.gff.modified" "$out_dir/coordinate_files/${isolate}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/$isolate" >> "$out_dir/log.txt"
 done
 
 printf "Clustering IGRs...\n" >> "$out_dir/log.txt";printf "Clustering IGRs...\n"
 
-cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aL "$len_identity" -g 0 -r 1 -mask N &> /dev/null
+cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N &> /dev/null
 
 rm "$out_dir/output_fasta_clustered.fasta"
 
@@ -195,6 +209,13 @@ cluster_count=${#cluster_array[@]}
 
 printf "%i IGR clusters found after merging.\n" "$cluster_count" >> "$out_dir/log.txt";printf "%i IGR clusters found after merging.\n" "$cluster_count"
 
+cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"
+
+roary_igry_combiner.pl "$out_dir" "$roary_dir" >> "$out_dir/log.txt"
+
+if [ "$fast" -eq 0 ]
+then
+
 printf "Aligning IGR clusters...\n" >> "$out_dir/log.txt";printf "Aligning IGR clusters...\n"
 
 for ((i = 0 ; i < $cluster_count ; i++))
@@ -224,8 +245,6 @@ done
 
 printf "IGR clusters aligned.\n" >> "$out_dir/log.txt";printf "IGR clusters aligned.\n"
 
-cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"
-
 #printf "Calculating gene divergences...\n" >> "$out_dir/log.txt";printf "Calculating gene divergences...\n"
 
 #divergence_checker.pl "$roary_dir/pan_genome_sequences" "$out_dir" "roary_gene_divergences.csv"
@@ -240,14 +259,12 @@ printf "IGR divergences calculated.\n" >> "$out_dir/log.txt";printf "IGR diverge
 
 core_alignment_creator.pl "$out_dir" >> "$out_dir/log.txt"
 
-roary_igry_combiner.pl "$out_dir" "$roary_dir" >> "$out_dir/log.txt"
-
 if [ ! -d "$out_dir/switched_region_files" ]
 then
 	mkdir "$out_dir/switched_region_files"
 fi
 
-switched_region_creator.pl "$out_dir/roary_igry_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir"
+switched_region_creator.pl "$out_dir/roary_igry_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" >> "$out_dir/log.txt"
 
 if [ ! -d "$out_dir/switched_region_alignment_files" ]
 then
@@ -292,6 +309,8 @@ then
 	# Needs R, Rscript, ggplot2, cowplot, reshape2.
 
 	R_plotter.R "$out_dir" "$nuc_identity" "$len_identity" &> /dev/null
+fi
+
 fi
 
 # Cleanup

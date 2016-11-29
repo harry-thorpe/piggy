@@ -73,9 +73,10 @@ while(<INPUT>){
 			foreach $cluster(@match_cluster_array){
 				@match_array=keys(%{$match_hash{$cluster}});
 				$match_len_total=scalar(@match_array);
-				$match_pcn_total=($match_len_total/$cluster_1_len);
+				$match_cluster_1_total=($match_len_total/$cluster_1_len);
+				$match_cluster_2_total=($match_len_total/$cluster_2_len);
 		
-				if($match_pcn_total >= $len_identity){
+				if($match_cluster_1_total >= $len_identity && $match_cluster_2_total >= 0.9){
 					if(!$merged_hash{$cluster}){
 						push @merge_cluster_array, $cluster;
 						
@@ -121,7 +122,7 @@ while(<INPUT>){
 		$cluster_1=$line_array[0];
 		$cluster_2=$line_array[1];
 		$cluster_1_len=$line_array[2];
-		#$cluster_2_len=$line_array[3];
+		$cluster_2_len=$line_array[3];
 		$match_pcn=$line_array[4];
 		$match_pcn=($match_pcn/100);
 		#$match_len=$line_array[5];
