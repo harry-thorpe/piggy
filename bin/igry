@@ -12,8 +12,8 @@ igry
  -r roary output directory [required]
  -n minimum percentage nucleotide identity [default - 90]
  -l minimum percentage length identity [default - 90]
- -R Make R plots (Needs R, Rscript, ggplot2, cowplot, reshape2) [default - off]
- -f Fast mode (doesn't align IGRs, detect switched regions, or make plots) [default - off]
+ -R Make R plots (Needs R, Rscript, ggplot2, reshape2) [default - off]
+ -f Fast mode (doesn't align IGRs or detect switched regions) [default - off]
  -h help
 
 EOF
@@ -304,13 +304,22 @@ printf "Candidate switched IGR divergences calculated.\n" >> "$out_dir/log.txt";
 
 if [ "$R_plots" -eq 1 ]
 then
-	printf "Making R plots.\n"
+	printf "Making switched region R plots.\n"
 
-	# Needs R, Rscript, ggplot2, cowplot, reshape2.
+	# Needs R, Rscript, ggplot2, reshape2.
 
-	R_plotter.R "$out_dir" "$nuc_identity" "$len_identity" &> /dev/null
+	SR_plotter.R "$out_dir" "$nuc_identity" "$len_identity" &> /dev/null
 fi
 
+fi
+
+if [ "$R_plots" -eq 1 ]
+then
+	printf "Making general R plots.\n"
+
+	# Needs R, Rscript, ggplot2, reshape2.
+
+	R_plotter.R "$out_dir" "$roary_dir" &> /dev/null
 fi
 
 # Cleanup
