@@ -57,6 +57,9 @@ args <- commandArgs(trailingOnly=TRUE)
 out_dir=args[1]
 roary_dir=args[2]
 
+#out_dir <- "/media/harry/extra/igry_test/igry_out"
+#roary_dir <- "/media/harry/extra/igry_test/roary_out"
+
 #####
 
 in_file=paste(roary_dir, "/gene_presence_absence.csv", sep="")
@@ -104,6 +107,7 @@ row_count <- length(row_array)
 Rep <- NULL
 Isolates <- NULL
 Count <- NULL
+Category <- NULL
 
 count <- 0
 for(rep in 1:100){
@@ -122,7 +126,7 @@ for(rep in 1:100){
   }
 }
 
-gene_accumulation_df <- data.frame(Rep, Isolates, Count, stringsAsFactors=FALSE)
+gene_accumulation_df <- data.frame(Rep, Isolates, Category, Count, stringsAsFactors=FALSE)
 
 gene_accumulation_df_summary <- summarySE(gene_accumulation_df, measurevar="Count", groupvars=c("Category", "Isolates"))
 
@@ -137,6 +141,7 @@ row_count <- length(row_array)
 Rep <- NULL
 Isolates <- NULL
 Count <- NULL
+Category <- NULL
 
 count <- 0
 for(rep in 1:100){
@@ -155,7 +160,7 @@ for(rep in 1:100){
   }
 }
 
-IGR_accumulation_df <- data.frame(Rep, Isolates, Count, stringsAsFactors=FALSE)
+IGR_accumulation_df <- data.frame(Rep, Isolates, Category, Count, stringsAsFactors=FALSE)
 
 IGR_accumulation_df_summary <- summarySE(IGR_accumulation_df, measurevar="Count", groupvars=c("Category", "Isolates"))
 
@@ -163,9 +168,12 @@ IGR_accumulation_df_summary <- summarySE(IGR_accumulation_df, measurevar="Count"
 
 all_accumulation_df_summary <- rbind(gene_accumulation_df_summary, IGR_accumulation_df_summary)
 
+y_max <- max(all_accumulation_df_summary$Count)
+y_max <- (((as.integer(y_max / 1000)) + 1) * 1000)
+
 all_accumulation_plot <- ggplot(all_accumulation_df_summary, aes(x=Isolates, y=Count, colour=Category, group=Category)) +
   geom_line() +
-  scale_y_continuous(limits=c(0,3000))
+  scale_y_continuous(limits=c(0,y_max))
 
 out_file=paste(out_dir, "/gene_IGR_accumulation.tif", sep="")
 
