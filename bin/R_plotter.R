@@ -57,8 +57,8 @@ args <- commandArgs(trailingOnly=TRUE)
 out_dir=args[1]
 roary_dir=args[2]
 
-#out_dir <- "/media/harry/extra/igry_test/igry_out"
-#roary_dir <- "/media/harry/extra/igry_test/roary_out"
+#out_dir <- "/media/harry/extra/ST131_subset/piggy_out_l_90"
+#roary_dir <- "/media/harry/extra/ST131_subset/roary_out"
 
 #####
 
