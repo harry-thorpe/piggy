@@ -153,10 +153,15 @@ then
 	mkdir "$out_dir/gff_files"
 fi
 
+cp -r "$in_dir" "$out_dir/gff_files"
+
+if [ -d "$roary_dir/fixed_input_files" ]
+then
+	cp -r "$roary_dir/fixed_input_files" "$out_dir/gff_files"
+fi
+
 for isolate in ${isolate_array[@]}
-do
-	cp "$in_dir/$isolate.gff" "$out_dir/gff_files"
-	
+do	
 	gff_modifier.pl "$out_dir/gff_files/$isolate.gff" >> "$out_dir/log.txt"
 	
 	gene_intergenic_coordinate_extracter.pl "$isolate" "$out_dir/gff_files/$isolate.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt"
