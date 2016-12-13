@@ -153,11 +153,11 @@ then
 	mkdir "$out_dir/gff_files"
 fi
 
-cp -r "$in_dir" "$out_dir/gff_files"
+cp "$in_dir/"*.gff "$out_dir/gff_files"
 
 if [ -d "$roary_dir/fixed_input_files" ]
 then
-	cp -r "$roary_dir/fixed_input_files" "$out_dir/gff_files"
+	cp "$roary_dir/fixed_input_files/"*.gff "$out_dir/gff_files"
 fi
 
 for isolate in ${isolate_array[@]}

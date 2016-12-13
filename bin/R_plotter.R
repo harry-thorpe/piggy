@@ -57,8 +57,8 @@ args <- commandArgs(trailingOnly=TRUE)
 out_dir=args[1]
 roary_dir=args[2]
 
-#out_dir <- "/media/harry/extra/ST131_subset/piggy_out_l_90"
-#roary_dir <- "/media/harry/extra/ST131_subset/roary_out"
+#out_dir <- "/media/harry/extra/roary_piggy_comparison"
+#roary_dir <- "/media/harry/extra/roary_piggy_comparison"
 
 #####
 
@@ -84,8 +84,14 @@ IGR_presence_absence <- data.frame(Category, IGR_presence_absence, stringsAsFact
 
 all_presence_absence <- rbind(gene_presence_absence, IGR_presence_absence)
 
+if(max(all_presence_absence$No..isolates) > 100){
+  bin_width <- max(all_presence_absence$No..isolates) / 100
+}else{
+  bin_width <- 1
+}
+
 all_freq_plot <- ggplot(all_presence_absence, aes(x=No..isolates, fill=Category)) +
-  geom_histogram(binwidth=1, position="dodge") +
+  geom_histogram(binwidth=bin_width, position="dodge") +
   labs(x="Isolates", y="Count")
 
 out_file=paste(out_dir, "/gene_IGR_frequency.tif", sep="")
