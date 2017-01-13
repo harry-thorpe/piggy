@@ -90,25 +90,21 @@ while(<INPUT_I>){
 					$tmp_gene_1=$gene_id_hash{$isolate}{$int_id_array[1]};
 					$tmp_gene_2=$gene_id_hash{$isolate}{$int_id_array[2]};
 					
-					if(1 == 1){
-					
-						@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
-						@tmp_gene_array=sort(@tmp_gene_array);
-			
-						$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
-			
-						$int_gene_hash{$tmp_gene_1_2}++;					
-					}elsif(1 == 0){
-					
-						if($int_id_array[3] eq "CO_F"){
-							$int_gene_hash{$tmp_gene_2}++;
-						}elsif($int_id_array[3] eq "CO_R"){
-							$int_gene_hash{$tmp_gene_1}++;
-						}elsif($int_id_array[3] eq "DP"){
-							$int_gene_hash{$tmp_gene_1}++;
-							$int_gene_hash{$tmp_gene_2}++;
-						}
+					if($int_id_array[3] eq "CO_F"){
+						$tmp_gene_2="*$tmp_gene_2";
+					}elsif($int_id_array[3] eq "CO_R"){
+						$tmp_gene_1="*$tmp_gene_1";
+					}elsif($int_id_array[3] eq "DP"){
+						$tmp_gene_1="*$tmp_gene_1";
+						$tmp_gene_2="*$tmp_gene_2";
 					}
+					
+					@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
+					@tmp_gene_array=sort(@tmp_gene_array);
+		
+					$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
+		
+					$int_gene_hash{$tmp_gene_1_2}++;					
 				}
 			}
 		}
