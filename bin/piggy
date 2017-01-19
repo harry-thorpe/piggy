@@ -4,12 +4,12 @@ usage()
 {
 cat << EOF
 
-igry
+piggy
 
  -i input directory [default - current directory]
- -o output directory [default - current directory/igry_out]
- -t threads [default - 1]
+ -o output directory [default - current directory/piggy_out]
  -r roary output directory [required]
+ -t threads [default - 1]
  -n minimum percentage nucleotide identity [default - 90]
  -l minimum percentage length identity [default - 90]
  -R Make R plots (Needs R, Rscript, ggplot2, reshape2) [default - off]
@@ -25,12 +25,12 @@ then
 	exit
 fi
 
-while getopts "i: o: t: r: n: l: R f h" opt; do
+while getopts "i: o: r: t: n: l: R f h" opt; do
  	case "$opt" in
 		i) in_dir=$OPTARG;;
 		o) out_dir=$OPTARG;;
-		t) threads=$OPTARG;;
 		r) roary_dir=$OPTARG;;
+		t) threads=$OPTARG;;
 		n) nuc_identity=$OPTARG;;
 		l) len_identity=$OPTARG;;
 		R) R_plots=1;;
@@ -47,18 +47,18 @@ fi
 
 if [ -z "$out_dir" ]
 then
-	out_dir="$in_dir/igry_out"
-fi
-
-if [ -z "$threads" ]
-then
-	threads=1
+	out_dir="$in_dir/piggy_out"
 fi
 
 if [ -z "$roary_dir" ]
 then
 	printf "No Roary output directory specified.\n"
 	exit
+fi
+
+if [ -z "$threads" ]
+then
+	threads=1
 fi
 
 if [ -z "$nuc_identity" ]
@@ -216,7 +216,7 @@ printf "%i IGR clusters found after merging.\n" "$cluster_count" >> "$out_dir/lo
 
 cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"
 
-roary_igry_combiner.pl "$out_dir" "$roary_dir" >> "$out_dir/log.txt"
+roary_piggy_combiner.pl "$out_dir" "$roary_dir" >> "$out_dir/log.txt"
 
 if [ "$fast" -eq 0 ]
 then
@@ -269,7 +269,7 @@ then
 	mkdir "$out_dir/switched_region_files"
 fi
 
-switched_region_creator.pl "$out_dir/roary_igry_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" >> "$out_dir/log.txt"
+switched_region_creator.pl "$out_dir/roary_piggy_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" >> "$out_dir/log.txt"
 
 if [ ! -d "$out_dir/switched_region_alignment_files" ]
 then

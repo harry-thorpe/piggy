@@ -10,7 +10,7 @@ $roary_dir=$ARGV[1];
 print STDOUT "Combining gene and IGR matrices...\n";
 print STDERR "Combining gene and IGR matrices...\n";
 
-open OUTPUT, ">$out_dir/roary_igry_combined.tab";
+open OUTPUT, ">$out_dir/roary_piggy_combined.tab";
 
 open INPUT_R, "$roary_dir/gene_presence_absence.csv";
 while(<INPUT_R>){
