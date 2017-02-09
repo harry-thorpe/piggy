@@ -175,7 +175,7 @@ done
 
 printf "Clustering IGRs...\n" >> "$out_dir/log.txt";printf "Clustering IGRs...\n"
 
-cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N &> /dev/null
+cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 &> /dev/null
 
 rm "$out_dir/output_fasta_clustered.fasta"
 
