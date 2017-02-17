@@ -36,15 +36,18 @@ while(<INPUT_R>){
 				#push @isolate_array, $header_array[$i];
 			}
 		}else{
-			for($i=$isolate_sta; $i<=$isolate_end; $i++){
-				if($line_array[$i]){
-					$isolate=$header_array[$i];
-					$gene_id=$line_array[$i];
-					$gene=$line_array[0];
+			# Only use single copy genes.
+			if($line_array[5] == 1){
+				for($i=$isolate_sta; $i<=$isolate_end; $i++){
+					if($line_array[$i]){
+						$isolate=$header_array[$i];
+						$gene_id=$line_array[$i];
+						$gene=$line_array[0];
 			
-					#print "$isolate\n";
+						#print "$isolate\n";
 			
-					$gene_id_hash{$isolate}{$gene_id}=$gene;
+						$gene_id_hash{$isolate}{$gene_id}=$gene;
+					}
 				}
 			}
 		}
