@@ -6,6 +6,7 @@ print STDOUT "Producing IGR presence absence matrix...\n";
 print STDERR "Producing IGR presence absence matrix...\n";
 
 open OUTPUT, ">$out_dir/IGR_presence_absence.csv";
+open OUTPUT_RTAB, ">$out_dir/IGR_presence_absence.Rtab";
 
 open INPUT, "$out_dir/isolates.txt";
 while(<INPUT>){
@@ -53,10 +54,14 @@ foreach $cluster(@cluster_array){
 @cluster_sorted_array=sort { $cluster_isolate_count_hash{$b} <=> $cluster_isolate_count_hash{$a} } keys %cluster_isolate_count_hash;
 
 print OUTPUT "\"Gene\",\"Non-unique Gene name\",\"Annotation\",\"No. isolates\",\"No. sequences\",\"Avg sequences per isolate\",\"Genome Fragment\",\"Order within Fragment\",\"Accessory Fragment\",\"Accessory Order with Fragment\",\"QC\",\"Min group size nuc\",\"Max group size nuc\",\"Avg group size nuc\"";
+print OUTPUT_RTAB "Gene";
+
 foreach $isolate(@isolate_array){
 	print OUTPUT ",\"$isolate\"";
+	print OUTPUT_RTAB "\t$isolate";
 }
 print OUTPUT "\n";
+print OUTPUT_RTAB "\n";
 
 foreach $cluster(@cluster_sorted_array){
 	$ave_seqs=($cluster_seq_count_hash{$cluster}/$cluster_isolate_count_hash{$cluster});
@@ -65,11 +70,14 @@ foreach $cluster(@cluster_sorted_array){
 	foreach $isolate(@isolate_array){
 		if($cluster_hash{$cluster}{$isolate}){
 			print OUTPUT ",\"$cluster_hash{$cluster}{$isolate}\"";
+			print OUTPUT_RTAB "\t1";
 		}else{
 			print OUTPUT ",\"\"";
+			print OUTPUT_RTAB "\t0";
 		}
 	}
 	print OUTPUT "\n";
+	print OUTPUT_RTAB "\n";
 }
 
 print STDOUT "IGR presence absence matrix produced.\n";
