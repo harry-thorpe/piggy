@@ -25,6 +25,101 @@ then
 	exit
 fi
 
+# Check for dependencies.
+
+# cd-hit
+cd_hit_command_array=("cd-hit-est" "cdhit-est")
+
+found=0
+for command in ${cd_hit_command_array[@]}
+do
+	cd_hit_command=$(command -v $command)
+	
+	if [ ! -z "$cd_hit_command" ]
+	then
+		found=1
+		
+		break
+	fi
+done
+
+if [ "$found" -eq 1 ]
+then
+	printf "cd-hit found: %s\n" "$cd_hit_command"
+else
+	printf "Error: cd-hit not found\n"
+fi
+
+# mafft
+mafft_command_array=("mafft")
+
+found=0
+for command in ${mafft_command_array[@]}
+do
+	mafft_command=$(command -v $command)
+	
+	if [ ! -z "$mafft_command" ]
+	then
+		found=1
+		
+		break
+	fi
+done
+
+if [ "$found" -eq 1 ]
+then
+	printf "mafft found: %s\n" "$mafft_command"
+else
+	printf "Error: mafft not found\n"
+fi
+
+# blastn
+blastn_command_array=("blastn")
+
+found=0
+for command in ${blastn_command_array[@]}
+do
+	blastn_command=$(command -v $command)
+	
+	if [ ! -z "$blastn_command" ]
+	then
+		found=1
+		
+		break
+	fi
+done
+
+if [ "$found" -eq 1 ]
+then
+	printf "blastn found: %s\n" "$blastn_command"
+else
+	printf "Error: blastn not found\n"
+fi
+
+# makeblastdb
+makeblastdb_command_array=("makeblastdb")
+
+found=0
+for command in ${makeblastdb_command_array[@]}
+do
+	makeblastdb_command=$(command -v $command)
+	
+	if [ ! -z "$makeblastdb_command" ]
+	then
+		found=1
+		
+		break
+	fi
+done
+
+if [ "$found" -eq 1 ]
+then
+	printf "makeblastdb found: %s\n" "$makeblastdb_command"
+else
+	printf "Error: makeblastdb not found\n"
+fi
+
+
 while getopts "i: o: r: t: n: l: R f h" opt; do
  	case "$opt" in
 		i) in_dir=$OPTARG;;
@@ -175,7 +270,7 @@ done
 
 printf "Clustering IGRs...\n" >> "$out_dir/log.txt";printf "Clustering IGRs...\n"
 
-cdhit-est -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 &> /dev/null
+$cd_hit_command -i $out_dir/output_fasta.fasta -o "$out_dir/output_fasta_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 &> /dev/null
 
 rm "$out_dir/output_fasta_clustered.fasta"
 
@@ -200,9 +295,9 @@ cluster_file_creator.pl "$out_dir" >> "$out_dir/log.txt"
 
 printf "Doing all-vs-all IGR cluster search.\n" >> "$out_dir/log.txt";printf "Doing all-vs-all IGR cluster search.\n"
 
-makeblastdb -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl > /dev/null
+$makeblastdb_command -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl > /dev/null
 
-blastn -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
+$blastn_command -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
 
 printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
 
@@ -231,8 +326,8 @@ do
 	
 	if [ "$seq_count" -gt 1 ]
 	then
-		mafft --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
-		#mafft --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
+		$mafft_command --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
+		#$mafft_command --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null
 		
 		fasta_converter.pl "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" "$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta"
 		
@@ -282,7 +377,7 @@ printf "Aligning candidate switched IGRs...\n" >> "$out_dir/log.txt";printf "Ali
 
 for switched_region in ${switched_region_array[@]}
 do
-	blastn -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -outfmt 6 -out "$out_dir/blast_out.tab"
+	$blastn_command -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -outfmt 6 -out "$out_dir/blast_out.tab"
 	
 	blast_hit=$(blast_parser.pl "$out_dir/blast_out.tab" "$out_dir/switched_region_files/${switched_region}.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta")
 	
@@ -290,8 +385,8 @@ do
 	
 	if [ "$blast_hit" = "hit" ]
 	then
-		mafft --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
-		#mafft --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+		$mafft_command --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
+		#$mafft_command --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null
 	
 		fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"
 	fi
