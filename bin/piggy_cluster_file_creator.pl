@@ -10,7 +10,7 @@ open OUTPUT, ">$out_dir/clusters.txt";
 open OUTPUT_REP, ">$out_dir/representative_clusters.fasta";
 
 $count=0;
-open INPUT, "$out_dir/output_fasta_clustered.fasta.clstr";
+open INPUT, "$out_dir/IGR_sequences_clustered.fasta.clstr";
 while(<INPUT>){
 	$line=$_;
 	chomp $line;
@@ -64,7 +64,7 @@ close OUTPUT;
 close OUTPUT_REP;
 
 $count=0;
-open INPUT, "$out_dir/output_fasta_clustered.fasta.clstr";
+open INPUT, "$out_dir/IGR_sequences_clustered.fasta.clstr";
 while(<INPUT>){
 	$line=$_;
 	chomp $line;

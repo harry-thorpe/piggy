@@ -10,7 +10,7 @@ $min_len=30;
 $max_len=1000;
 $max_n_prop=0.1;
 
-open OUTPUT, ">>$out_dir/output_fasta.fasta";
+open OUTPUT, ">>$out_dir/IGR_sequences.fasta";
 
 $include=0;
 open INPUT, "$in_file";
