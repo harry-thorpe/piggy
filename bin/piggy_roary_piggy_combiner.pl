@@ -6,6 +6,7 @@
 
 $out_dir=$ARGV[0];
 $roary_dir=$ARGV[1];
+$method=$ARGV[2];
 
 print STDOUT "Combining gene and IGR matrices...\n";
 print STDERR "Combining gene and IGR matrices...\n";
@@ -93,21 +94,42 @@ while(<INPUT_I>){
 					$tmp_gene_1=$gene_id_hash{$isolate}{$int_id_array[1]};
 					$tmp_gene_2=$gene_id_hash{$isolate}{$int_id_array[2]};
 					
-					if($int_id_array[3] eq "CO_F"){
-						$tmp_gene_2="*$tmp_gene_2";
-					}elsif($int_id_array[3] eq "CO_R"){
-						$tmp_gene_1="*$tmp_gene_1";
-					}elsif($int_id_array[3] eq "DP"){
-						$tmp_gene_1="*$tmp_gene_1";
-						$tmp_gene_2="*$tmp_gene_2";
-					}
+					if($method eq "GENE_PAIR"){
 					
-					@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
-					@tmp_gene_array=sort(@tmp_gene_array);
+						if($int_id_array[3] eq "CO_F"){
+							$tmp_gene_2="*$tmp_gene_2";
+						}elsif($int_id_array[3] eq "CO_R"){
+							$tmp_gene_1="*$tmp_gene_1";
+						}elsif($int_id_array[3] eq "DP"){
+							$tmp_gene_1="*$tmp_gene_1";
+							$tmp_gene_2="*$tmp_gene_2";
+						}
+					
+						@tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
+						@tmp_gene_array=sort(@tmp_gene_array);
 		
-					$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
+						$tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
 		
-					$int_gene_hash{$tmp_gene_1_2}++;					
+						$int_gene_hash{$tmp_gene_1_2}++;
+						
+					}elsif($method eq "UPSTREAM"){
+					
+						if($int_id_array[3] eq "CO_F"){
+							$tmp_gene_2="*$tmp_gene_2";
+						
+							$int_gene_hash{$tmp_gene_2}++;
+						}elsif($int_id_array[3] eq "CO_R"){
+							$tmp_gene_1="*$tmp_gene_1";
+						
+							$int_gene_hash{$tmp_gene_1}++;
+						}elsif($int_id_array[3] eq "DP"){
+							$tmp_gene_1="*$tmp_gene_1";
+							$tmp_gene_2="*$tmp_gene_2";
+						
+							$int_gene_hash{$tmp_gene_1}++;
+							$int_gene_hash{$tmp_gene_2}++;
+						}
+					}				
 				}
 			}
 		}
