@@ -442,18 +442,26 @@ fi
 
 # Cleanup
 
-mkdir "$out_dir/plots" &> /dev/null
-mv "$out_dir/"*".tif" "$out_dir/plots"
+if [ "$R_plots" -eq 1 ]
+then
+	mkdir "$out_dir/plots" &> /dev/null
+	mv "$out_dir/"*".tif" "$out_dir/plots"
+fi
+
+if [ "$fast" -eq 0 ]
+then
+	rm -r "$out_dir/switched_region_files"
+	rm -r "$out_dir/isolate_core_IGR_tmp"
+	
+	rm "$out_dir/switched_regions.txt"
+fi
 
 rm -r "$out_dir/isolate_intergenic_files"
 rm -r "$out_dir/cluster_intergenic_files"
 rm -r "$out_dir/cluster_representative_files"
-rm -r "$out_dir/switched_region_files"
-rm -r "$out_dir/isolate_core_IGR_tmp"
 
 rm "$out_dir/clusters.txt"
 rm "$out_dir/isolates.txt"
-rm "$out_dir/switched_regions.txt"
 rm "$out_dir/representative_clusters_db.nhr"
 rm "$out_dir/representative_clusters_db.nin"
 rm "$out_dir/representative_clusters_db.nsq"
