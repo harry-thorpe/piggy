@@ -10,7 +10,7 @@ open INPUT, $in_blast_file;
 while(<INPUT>){
 	$line=$_;
 	chomp $line;
-	@line_array=split(/\s+/, $line);
+	@line_array=split(/\t/, $line);
 	
 	if($line_array[0] eq $line_array[1]){
 		$seq_header_hash{$line_array[0]}=$line_array[3];
@@ -27,7 +27,7 @@ if($seq_header_count > 1){
 	while(<INPUT>){
 		$line=$_;
 		chomp $line;
-		@line_array=split(/\s+/, $line);
+		@line_array=split(/\t/, $line);
 	
 		if($line_array[0] eq $seq_header_array[0] && $line_array[1] eq $seq_header_array[1]){
 			$hits++;
