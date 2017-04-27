@@ -464,28 +464,29 @@ then
 	mv "$out_dir/"*".tif" "$out_dir/plots"
 fi
 
-#if [ "$fast" -eq 0 ]
-#then
-#	rm -r "$out_dir/switched_region_files"
-#	rm -r "$out_dir/isolate_core_IGR_tmp"
-#	
-#	rm "$out_dir/switched_regions.txt"
-#fi
+if [ "$fast" -eq 0 ]
+then
+	rm -r "$out_dir/switched_region_files"
+	rm -r "$out_dir/isolate_core_IGR_tmp"
+	
+	rm "$out_dir/switched_regions.txt"
+fi
 
-#rm -r "$out_dir/isolate_intergenic_files"
-#rm -r "$out_dir/isolate_gene_fragment_files
-#rm -r "$out_dir/cluster_intergenic_files"
-#rm -r "$out_dir/cluster_representative_files"
+rm -r "$out_dir/coordinate_files"
+rm -r "$out_dir/isolate_intergenic_files"
+rm -r "$out_dir/isolate_gene_fragment_files"
+rm -r "$out_dir/cluster_intergenic_files"
+rm -r "$out_dir/cluster_representative_files"
 
-#rm "$out_dir/clusters.txt"
-#rm "$out_dir/isolates.txt"
-#rm "$out_dir/representative_clusters_db.nhr"
-#rm "$out_dir/representative_clusters_db.nin"
-#rm "$out_dir/representative_clusters_db.nsq"
-#rm "$out_dir/representative_clusters_merged.tab"
-#rm "$out_dir/representative_clusters.fasta"
-#rm "$out_dir/representative_clusters_blast_out.tab"
-#rm "$out_dir/representative_clusters_blast_out_modified.tab"
-#rm "$out_dir/IGR_sequences_clustered.fasta"
-#rm "$out_dir/IGR_sequences_clustered.fasta.clstr"
+rm "$out_dir/clusters.txt"
+rm "$out_dir/isolates.txt"
+rm "$out_dir/representative_clusters_db.nhr"
+rm "$out_dir/representative_clusters_db.nin"
+rm "$out_dir/representative_clusters_db.nsq"
+rm "$out_dir/representative_clusters_merged.tab"
+rm "$out_dir/representative_clusters.fasta"
+rm "$out_dir/representative_clusters_blast_out.tab"
+rm "$out_dir/representative_clusters_blast_out_modified.tab"
+rm "$out_dir/IGR_sequences_clustered.fasta"
+rm "$out_dir/IGR_sequences_clustered.fasta.clstr"
 
