@@ -165,8 +165,13 @@ fi
 if [ -z "$nuc_identity" ]
 then
 	nuc_identity=0.9
+	cdhit_nuc_identity=$nuc_identity
+elif [ "$nuc_identity" -lt 80 ]
+then
+	cdhit_nuc_identity=0.8
 else
 	nuc_identity=$(echo "print $nuc_identity / 100" | perl)
+	cdhit_nuc_identity=$nuc_identity
 fi
 
 if [ -z "$len_identity" ]
@@ -299,7 +304,7 @@ done
 
 printf "Clustering IGRs...\n" >> "$out_dir/log.txt";printf "Clustering IGRs...\n"
 
-$cd_hit_command -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 &> /dev/null
+$cd_hit_command -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 &> /dev/null
 
 printf "IGRs clustered.\n" >> "$out_dir/log.txt";printf "IGRs clustered.\n"
 
