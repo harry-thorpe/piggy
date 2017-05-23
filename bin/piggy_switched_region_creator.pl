@@ -1,4 +1,5 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
+use warnings;
 
 $in_file=$ARGV[0];
 $in_dir=$ARGV[1];

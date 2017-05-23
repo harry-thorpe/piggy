@@ -1,20 +1,22 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
+use warnings;
+use strict;
 
-$in_file=$ARGV[0];
+my $in_file=$ARGV[0];
+
+my $in_base=$in_file;
 
 if($in_file =~ /\/([^\/]+)\.gff/){
 	$in_base=$1;
-}else{
-	$in_base=$in_file;
 }
 
 open OUTPUT, ">$in_file.modified";
 
-$include=0;
-$fir=0;
+my $include=0;
+my $fir=0;
+
 open INPUT, "$in_file";
-while(<INPUT>){
-	$line=$_;
+while(my $line=<INPUT>){
 	chomp $line;
 	
 	if($include == 0 && $line !~ /^##FASTA/){
