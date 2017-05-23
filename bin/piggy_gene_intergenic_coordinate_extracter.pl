@@ -1,27 +1,33 @@
 #!/usr/bin/env perl
 use warnings;
 
-$isolate=$ARGV[0];
-$in_file=$ARGV[1];
-$out_dir=$ARGV[2];
+my $isolate=$ARGV[0];
+my $in_file=$ARGV[1];
+my $out_dir=$ARGV[2];
 
 open OUTPUT_G, ">$out_dir/${isolate}_gene_coordinates.tab";
 print OUTPUT_G "Name\tGene\tStart\tEnd\tLength\tType\tStrand\tContig\n";
 open OUTPUT_I, ">$out_dir/${isolate}_intergenic_coordinates.tab";
 print OUTPUT_I "Name\tGene_name\tStart\tEnd\tLength\tType\tContig\n";
 
+my @gene_array=();
+my %contig_hash_end=();
+
 open INPUT, "$in_file";
-while(<INPUT>){
-	$line=$_;
+while(my $line=<INPUT>){
 	chomp $line;
-	@line_array=split(/\t/, $line);
+	my @line_array=split(/\t/, $line);
 	
-	$contig="";
-	$sta="";
-	$end="";
-	$strand="";
-	$id="";
-	$gene="";
+	my $contig="";
+	my $sta="";
+	my $end="";
+	my $len="";
+	my $type="";
+	my $strand="";
+	my $id="";
+	my $gene="";
+	my $seq_end="";
+	
 	if($line !~ /^##/){
 		if($line_array[2] eq "CDS" || $line_array[2] eq "rRNA" || $line_array[2] eq "tRNA"){
 			$contig=$line_array[0];
@@ -44,8 +50,8 @@ while(<INPUT>){
 				$gene=$1;
 			}
 		
-			@tmp_array=();
-			@tmp_array=("$id", "$gene", "$sta", "$end", "$len", "$type", "$strand", "$contig");
+			my @tmp_array=();
+			my @tmp_array=("$id", "$gene", "$sta", "$end", "$len", "$type", "$strand", "$contig");
 		
 			push @gene_array, [@tmp_array];
 		
@@ -65,10 +71,10 @@ while(<INPUT>){
 	}
 }
 
-$gene_count=scalar(@gene_array);
+my $gene_count=scalar(@gene_array);
 
-$int_count=0;
-for($i=0; $i<$gene_count; $i++){
+my $int_count=0;
+for(my $i=0; $i<$gene_count; $i++){
 	# First gene.
 	if($i == 0){
 		$contig=$gene_array[$i][7];

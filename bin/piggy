@@ -148,7 +148,7 @@ fi
 
 if [ -z "$out_dir" ]
 then
-	out_dir="$in_dir/piggy_out"
+	out_dir="$PWD/piggy_out"
 fi
 
 if [ -z "$roary_dir" ]
