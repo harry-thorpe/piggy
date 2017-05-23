@@ -329,7 +329,7 @@ printf "Doing all-vs-all IGR cluster search.\n" >> "$out_dir/log.txt";printf "Do
 
 $makeblastdb_command -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl > /dev/null
 
-$blastn_command -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
+$blastn_command -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -task blastn -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore" > /dev/null
 
 printf "Merging IGR clusters.\n" >> "$out_dir/log.txt";printf "Merging IGR clusters.\n"
 
@@ -409,13 +409,13 @@ printf "Aligning candidate switched IGRs...\n" >> "$out_dir/log.txt";printf "Ali
 
 for switched_region in ${switched_region_array[@]}
 do
-	$blastn_command -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}_gene_fragments.fasta" -dust no -outfmt 6 -out "$out_dir/blast_out.tab"
+	$blastn_command -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}_gene_fragments.fasta" -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"
 	
 	blast_hit=$(piggy_blast_parser_overlaps.pl "$out_dir/blast_out.tab")
 		
 	if [ "$blast_hit" = "no_hit" ]
 	then
-		$blastn_command -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -outfmt 6 -out "$out_dir/blast_out.tab"
+		$blastn_command -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"
 	
 		blast_hit=$(piggy_blast_parser.pl "$out_dir/blast_out.tab" "$out_dir/switched_region_files/${switched_region}.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta")
 	
