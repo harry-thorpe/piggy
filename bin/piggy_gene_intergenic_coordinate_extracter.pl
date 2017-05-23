@@ -19,14 +19,14 @@ while(my $line=<INPUT>){
 	my @line_array=split(/\t/, $line);
 	
 	my $contig="";
-	my $sta="";
-	my $end="";
-	my $len="";
+	my $sta=0;
+	my $end=0;
+	my $len=0;
 	my $type="";
 	my $strand="";
 	my $id="";
 	my $gene="";
-	my $seq_end="";
+	my $seq_end=0;
 	
 	if($line !~ /^##/){
 		if($line_array[2] eq "CDS" || $line_array[2] eq "rRNA" || $line_array[2] eq "tRNA"){
@@ -51,7 +51,7 @@ while(my $line=<INPUT>){
 			}
 		
 			my @tmp_array=();
-			my @tmp_array=("$id", "$gene", "$sta", "$end", "$len", "$type", "$strand", "$contig");
+			@tmp_array=("$id", "$gene", "$sta", "$end", "$len", "$type", "$strand", "$contig");
 		
 			push @gene_array, [@tmp_array];
 		
@@ -73,7 +73,17 @@ while(my $line=<INPUT>){
 
 my $gene_count=scalar(@gene_array);
 
+my $contig="";
+my $int_sta=0;
+my $int_end=0;
+my $int_len=0;
+my $gene_pre="";
+my $gene_pos="";
+my $int_type="";
+my $int_name="";
+my $int_id="";
 my $int_count=0;
+
 for(my $i=0; $i<$gene_count; $i++){
 	# First gene.
 	if($i == 0){
