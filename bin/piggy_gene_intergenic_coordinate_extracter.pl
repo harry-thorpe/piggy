@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use warnings;
+use strict;
 
 my $isolate=$ARGV[0];
 my $in_file=$ARGV[1];
