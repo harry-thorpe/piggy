@@ -1,50 +1,54 @@
 #!/usr/bin/env perl
 use warnings;
+use strict;
 
-$in_file=$ARGV[0];
-$in_dir=$ARGV[1];
-$out_dir=$ARGV[2];
-$in_g_dir=$ARGV[3];
+my $in_file=$ARGV[0];
+my $in_dir=$ARGV[1];
+my $out_dir=$ARGV[2];
+my $in_g_dir=$ARGV[3];
 
 print STDOUT "Detecting candidate switched IGRs...\n";
 print STDERR "Detecting candidate switched IGRs...\n";
 
 open OUTPUT_SR, ">$out_dir/switched_regions.txt";
 
+my %cluster_hash=();
+
 open INPUT, $in_file;
-while(<INPUT>){
-	$line=$_;
+while(my $line=<INPUT>){
 	chomp $line;
-	@line_array=split(/\s+/, $line);
+	my @line_array=split(/\s+/, $line);
 	
 	$cluster_hash{$line_array[1]}{$line_array[0]}=1;
 }
 
-@gene_pair_array=keys(%cluster_hash);
+my @gene_pair_array=keys(%cluster_hash);
 
-foreach $gene_pair(@gene_pair_array){
-	@cluster_array=keys(%{$cluster_hash{$gene_pair}});
+foreach my $gene_pair(@gene_pair_array){
+	my @cluster_array=keys(%{$cluster_hash{$gene_pair}});
 	@cluster_array=sort(@cluster_array);
 	
-	$cluster_count=scalar(@cluster_array);
+	my $cluster_count=scalar(@cluster_array);
 	
 	#print "$cluster_count";
 	
 	if($cluster_count > 1){
-		for($i=0; $i<$cluster_count; $i++){
+		for(my $i=0; $i<$cluster_count; $i++){
 			
-			$rep_1_len=0;
-			$rep_1_seq="";
-			$rep_1_id="";
+			my $rep_1_len=0;
+			my $rep_1_seq="";
+			my $rep_1_id="";
+			
+			my $id_1="";
+			
 			open FASTA_1, "$in_dir/$cluster_array[$i].fasta";
-			while(<FASTA_1>){
-				$line=$_;
+			while(my $line=<FASTA_1>){
 				chomp $line;
 				
 				if($line =~ /^>(.+)/){
 					$id_1=$1;
 				}else{
-					$seq_1_len=length($line);
+					my $seq_1_len=length($line);
 					
 					if($seq_1_len > $rep_1_len){
 						$rep_1_seq=$line;
@@ -54,20 +58,22 @@ foreach $gene_pair(@gene_pair_array){
 				}
 			}
 			
-			for($j=($i+1); $j<$cluster_count; $j++){
+			for(my $j=($i+1); $j<$cluster_count; $j++){
 				
-				$rep_2_len=0;
-				$rep_2_seq="";
-				$rep_2_id="";
+				my $rep_2_len=0;
+				my $rep_2_seq="";
+				my $rep_2_id="";
+				
+				my $id_2="";
+				
 				open FASTA_2, "$in_dir/$cluster_array[$j].fasta";
-				while(<FASTA_2>){
-					$line=$_;
+				while(my $line=<FASTA_2>){
 					chomp $line;
 				
 					if($line =~ /^>(.+)/){
 						$id_2=$1;
 					}else{
-						$seq_2_len=length($line);
+						my $seq_2_len=length($line);
 					
 						if($seq_2_len > $rep_2_len){
 							$rep_2_seq=$line;
@@ -82,6 +88,14 @@ foreach $gene_pair(@gene_pair_array){
 				print OUTPUT ">$rep_1_id\n$rep_1_seq\n>$rep_2_id\n$rep_2_seq\n";
 				
 				close OUTPUT;
+				
+				my $isolate_1="";
+				my $gene_1_1="";
+				my $gene_1_2="";
+				
+				my $isolate_2="";
+				my $gene_2_1="";
+				my $gene_2_2="";
 				
 				if($rep_1_id =~ /^(\S+)_\+_\+_(\S+)_\+_\+_(\S+)_\+_\+_\S+$/){
 					$isolate_1=$1;
@@ -98,26 +112,22 @@ foreach $gene_pair(@gene_pair_array){
 				open OUTPUT, ">$out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta";
 				
 				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_1.fasta";
-				while(<GENE_FRAG>){
-					$line=$_;
+				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
 				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_2.fasta";
-				while(<GENE_FRAG>){
-					$line=$_;
+				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
 				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_1.fasta";
-				while(<GENE_FRAG>){
-					$line=$_;
+				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
 				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_2.fasta";
-				while(<GENE_FRAG>){
-					$line=$_;
+				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
