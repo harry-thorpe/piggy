@@ -23,7 +23,7 @@ my $isolate_end=0;
 my %gene_id_hash=();
 			
 open INPUT_R, "$roary_dir/gene_presence_absence.csv";
-while(my $line=<INPUT>){
+while(my $line=<INPUT_R>){
 	chomp $line;
 	$line=~s/\R//g;
 	$line=~s/^"//;
@@ -60,8 +60,10 @@ while(my $line=<INPUT>){
 	#}
 }
 
+my $int="";
+
 open INPUT_I, "$out_dir/IGR_presence_absence.csv";
-while(my $line=<INPUT>){
+while(my $line=<INPUT_I>){
 	chomp $line;
 	$line=~s/\R//g;
 	$line=~s/^"//;
@@ -87,7 +89,7 @@ while(my $line=<INPUT>){
 				if($line_array[$i] =~ /^(\S+)/){
 					$int_id=$1;
 				}
-				my $int=$line_array[0];
+				$int=$line_array[0];
 			
 				my @int_id_array=split(/_\+_\+_/, $int_id);
 				
@@ -97,9 +99,6 @@ while(my $line=<INPUT>){
 					my $tmp_gene_2=$gene_id_hash{$isolate}{$int_id_array[2]};
 					
 					if($method eq "GENE_PAIR"){
-						
-						my $tmp_gene_1="";
-						my $tmp_gene_2="";
 						
 						if($int_id_array[3] eq "CO_F"){
 							$tmp_gene_2="*$tmp_gene_2";
@@ -111,16 +110,13 @@ while(my $line=<INPUT>){
 						}
 					
 						my @tmp_gene_array=("$tmp_gene_1", "$tmp_gene_2");
-						my @tmp_gene_array=sort(@tmp_gene_array);
+						@tmp_gene_array=sort(@tmp_gene_array);
 		
 						my $tmp_gene_1_2="$tmp_gene_array[0]_+_+_$tmp_gene_array[1]";
 		
 						$int_gene_hash{$tmp_gene_1_2}++;
 						
 					}elsif($method eq "UPSTREAM"){
-						
-						my $tmp_gene_1="";
-						my $tmp_gene_2="";
 						
 						if($int_id_array[3] eq "CO_F"){
 							$tmp_gene_2="*$tmp_gene_2";

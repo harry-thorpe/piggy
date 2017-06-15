@@ -1,15 +1,15 @@
 #!/usr/bin/env perl
 use warnings;
+use strict;
 
-$in_file=$ARGV[0];
-$out_file=$ARGV[1];
+my $in_file=$ARGV[0];
+my $out_file=$ARGV[1];
 
 open OUTPUT, ">$out_file";
 
-$beg_seq=0;
+my $beg_seq=0;
 open INPUT, "$in_file";
-while(<INPUT>){
-	$line=$_;
+while(my $line=<INPUT>){
 	chomp $line;
 	
 	if($line =~ /^>/){
