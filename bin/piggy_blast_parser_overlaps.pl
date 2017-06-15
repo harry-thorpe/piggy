@@ -1,14 +1,14 @@
 #!/usr/bin/env perl
 use warnings;
+use strict;
 
-$in_blast_file=$ARGV[0];
+my $in_blast_file=$ARGV[0];
 
-$hits=0;
+my $hits=0;
 open INPUT, $in_blast_file;
-while(<INPUT>){
-	$line=$_;
+while(my $line=<INPUT>){
 	chomp $line;
-	@line_array=split(/\t/, $line);
+	my @line_array=split(/\t/, $line);
 	
 	if($line_array[0] =~ /\S+/){
 		$hits++;

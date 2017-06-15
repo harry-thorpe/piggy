@@ -1,34 +1,35 @@
 #!/usr/bin/env perl
 use warnings;
+use strict;
 
-$in_blast_file=$ARGV[0];
-$in_file=$ARGV[1];
-$out_file=$ARGV[2];
+my $in_blast_file=$ARGV[0];
+my $in_file=$ARGV[1];
+my $out_file=$ARGV[2];
 
 open OUTPUT, ">$out_file";
 
+my %seq_header_hash=();
+
 open INPUT, $in_blast_file;
-while(<INPUT>){
-	$line=$_;
+while(my $line=<INPUT>){
 	chomp $line;
-	@line_array=split(/\t/, $line);
+	my @line_array=split(/\t/, $line);
 	
 	if($line_array[0] eq $line_array[1]){
 		$seq_header_hash{$line_array[0]}=$line_array[3];
 	}
 }
 
-@seq_header_array=keys(%seq_header_hash);
+my @seq_header_array=keys(%seq_header_hash);
 @seq_header_array=sort(@seq_header_array);
-$seq_header_count=scalar(@seq_header_array);
+my $seq_header_count=scalar(@seq_header_array);
 
-$hits=0;
+my $hits=0;
 if($seq_header_count > 1){
 	open INPUT, $in_blast_file;
-	while(<INPUT>){
-		$line=$_;
+	while(my $line=<INPUT>){
 		chomp $line;
-		@line_array=split(/\t/, $line);
+		my @line_array=split(/\t/, $line);
 	
 		if($line_array[0] eq $seq_header_array[0] && $line_array[1] eq $seq_header_array[1]){
 			$hits++;
@@ -36,23 +37,25 @@ if($seq_header_count > 1){
 	}
 }
 
+my $id="";
+my @seq_array=();
+
 if($hits > 0){
 	print STDOUT "hit";
 }else{
 	print STDOUT "no_hit";
 	
 	open FASTA, "$in_file";
-	while(<FASTA>){
-		$line=$_;
+	while(my $line=<FASTA>){
 		chomp $line;
 
 		if($line =~ /^>(.+)/){
 			$id=$1;
 		}elsif($line =~ /^([ATGCN]+)/){
-			$seq=$1;
-			$len=length($seq);
+			my $seq=$1;
+			my $len=length($seq);
 	
-			@tmp_array=("$id", "$seq", "$len");
+			my @tmp_array=("$id", "$seq", "$len");
 	
 			push @seq_array, [@tmp_array];
 		}
@@ -60,13 +63,13 @@ if($hits > 0){
 
 	print OUTPUT ">$seq_array[0][0]\n";
 	print OUTPUT "$seq_array[0][1]";
-	for($i=0; $i<$seq_array[1][2]; $i++){
+	for(my $i=0; $i<$seq_array[1][2]; $i++){
 		print OUTPUT "-";
 	}
 	print OUTPUT "\n";
 
 	print OUTPUT ">$seq_array[1][0]\n";
-	for($i=0; $i<$seq_array[0][2]; $i++){
+	for(my $i=0; $i<$seq_array[0][2]; $i++){
 		print OUTPUT "-";
 	}
 	print OUTPUT "$seq_array[1][1]";
