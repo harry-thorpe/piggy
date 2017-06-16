@@ -14,7 +14,7 @@ my $min_len=30;
 my $max_len=1000;
 my $max_n_prop=0.1;
 
-open OUTPUT, ">>$out_dir/IGR_sequences.fasta";
+open OUTPUT, ">>$out_dir/IGR_sequences.fasta" or die "Cannot open output file: $out_dir/IGR_sequences.fasta\n";
 
 my @contig_array=();
 my %contig_hash=();
@@ -23,7 +23,7 @@ my $contig="";
 my $contig_seq="";
 
 my $include=0;
-open INPUT, "$in_file";
+open INPUT, "$in_file" or die "Input file doesn't exist: $in_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	
@@ -51,7 +51,7 @@ while(my $line=<INPUT>){
 foreach $contig(@contig_array){
 	$contig_seq=$contig_hash{$contig};
 	
-	open INCOOR, "$in_coor_file";
+	open INCOOR, "$in_coor_file" or die "Input file doesn't exist: $in_coor_file\n";
 	while(my $line=<INCOOR>){
 		chomp $line;
 		my @line_array=split(/\t/, $line);
@@ -83,7 +83,7 @@ foreach $contig(@contig_array){
 					if($n_prop < $max_n_prop){
 						print OUTPUT ">$int_id\n$int_seq\n";
 					
-						open OUTPUT_ISOLATE, ">$out_iso_dir/$int_id.fasta";
+						open OUTPUT_ISOLATE, ">$out_iso_dir/$int_id.fasta" or die "Cannot open output file: $out_iso_dir/$int_id.fasta\n";
 						print OUTPUT_ISOLATE ">$int_id\n$int_seq\n";
 						close OUTPUT_ISOLATE;
 					}
@@ -96,7 +96,7 @@ foreach $contig(@contig_array){
 foreach $contig(@contig_array){
 	$contig_seq=$contig_hash{$contig};
 	
-	open INCOOR, "$in_coor_g_file";
+	open INCOOR, "$in_coor_g_file" or die "Input file doesn't exist: $in_coor_g_file\n";
 	while(my $line=<INCOOR>){
 		chomp $line;
 		my @line_array=split(/\t/, $line);
@@ -128,7 +128,7 @@ foreach $contig(@contig_array){
 						$gene_e_seq=$gene_e_seq.$base;
 					}
 				
-					open OUTPUT_ISOLATE, ">$out_iso_g_dir/$gene_id.fasta";
+					open OUTPUT_ISOLATE, ">$out_iso_g_dir/$gene_id.fasta" or die "Cannot open output file: $out_iso_g_dir/$gene_id.fasta\n";
 					print OUTPUT_ISOLATE ">${gene_id}_s\n$gene_s_seq\n>${gene_id}_e\n$gene_e_seq\n";
 					close OUTPUT_ISOLATE;
 				}

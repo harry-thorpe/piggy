@@ -7,12 +7,12 @@ my $out_dir=$ARGV[0];
 print STDOUT "Producing IGR presence absence matrix...\n";
 print STDERR "Producing IGR presence absence matrix...\n";
 
-open OUTPUT, ">$out_dir/IGR_presence_absence.csv";
-open OUTPUT_RTAB, ">$out_dir/IGR_presence_absence.Rtab";
+open OUTPUT, ">$out_dir/IGR_presence_absence.csv" or die "Cannot open output file: $out_dir/IGR_presence_absence.csv\n";
+open OUTPUT_RTAB, ">$out_dir/IGR_presence_absence.Rtab" or die "Cannot open output file: $out_dir/IGR_presence_absence.Rtab\n";
 
 my @isolate_array=();
 
-open INPUT, "$out_dir/isolates.txt";
+open INPUT, "$out_dir/isolates.txt" or die "Input file doesn't exist: $out_dir/isolates.txt\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	
@@ -22,7 +22,7 @@ close INPUT;
 
 my @cluster_array=();
 
-open INPUT, "$out_dir/clusters.txt";
+open INPUT, "$out_dir/clusters.txt" or die "Input file doesn't exist: $out_dir/clusters.txt\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	
@@ -35,7 +35,7 @@ my %cluster_seq_count_hash=();
 my %cluster_hash=();
 
 foreach my $cluster(@cluster_array){
-	open INPUT, "$out_dir/cluster_intergenic_files/$cluster.fasta";
+	open INPUT, "$out_dir/cluster_intergenic_files/$cluster.fasta" or die "Input file doesn't exist: $out_dir/cluster_intergenic_files/$cluster.fasta\n";
 	while(my $line=<INPUT>){
 		chomp $line;
 	

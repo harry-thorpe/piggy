@@ -6,11 +6,11 @@ my $in_blast_file=$ARGV[0];
 my $in_file=$ARGV[1];
 my $out_file=$ARGV[2];
 
-open OUTPUT, ">$out_file";
+open OUTPUT, ">$out_file" or die "Cannot open output file: $out_file\n";
 
 my %seq_header_hash=();
 
-open INPUT, $in_blast_file;
+open INPUT, $in_blast_file or die "Input file doesn't exist: $in_blast_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	my @line_array=split(/\t/, $line);
@@ -26,7 +26,7 @@ my $seq_header_count=scalar(@seq_header_array);
 
 my $hits=0;
 if($seq_header_count > 1){
-	open INPUT, $in_blast_file;
+	open INPUT, $in_blast_file or die "Input file doesn't exist: $in_blast_file\n";
 	while(my $line=<INPUT>){
 		chomp $line;
 		my @line_array=split(/\t/, $line);
@@ -45,7 +45,7 @@ if($hits > 0){
 }else{
 	print STDOUT "no_hit";
 	
-	open FASTA, "$in_file";
+	open FASTA, "$in_file" or die "Input file doesn't exist: $in_file\n";
 	while(my $line=<FASTA>){
 		chomp $line;
 

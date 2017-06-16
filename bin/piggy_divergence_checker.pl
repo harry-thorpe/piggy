@@ -6,7 +6,7 @@ my $in_dir=$ARGV[0];
 my $out_dir=$ARGV[1];
 my $out_file=$ARGV[2];
 
-open OUTPUT, ">$out_dir/$out_file";
+open OUTPUT, ">$out_dir/$out_file" or die "Cannot open output file: $out_dir/$out_file\n";
 print OUTPUT "Gene,Id_1,Id_2,SNPs,Sites,Length,Nuc_identity,Length_identity\n";
 
 opendir(my $dh, $in_dir);
@@ -33,7 +33,7 @@ while(readdir $dh){
 	my $ref_id="";
 	
 	my $count=0;
-	open INPUT, "$in_dir/$file";
+	open INPUT, "$in_dir/$file" or die "Input file doesn't exist: $in_dir/$file\n";
 	while(my $line=<INPUT>){
 		chomp $line;
 		

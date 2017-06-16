@@ -10,11 +10,11 @@ my $in_g_dir=$ARGV[3];
 print STDOUT "Detecting candidate switched IGRs...\n";
 print STDERR "Detecting candidate switched IGRs...\n";
 
-open OUTPUT_SR, ">$out_dir/switched_regions.txt";
+open OUTPUT_SR, ">$out_dir/switched_regions.txt" or die "Cannot open output file: $out_dir/switched_regions.txt\n";
 
 my %cluster_hash=();
 
-open INPUT, $in_file;
+open INPUT, $in_file or die "Input file doesn't exist: $in_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	my @line_array=split(/\s+/, $line);
@@ -41,7 +41,7 @@ foreach my $gene_pair(@gene_pair_array){
 			
 			my $id_1="";
 			
-			open FASTA_1, "$in_dir/$cluster_array[$i].fasta";
+			open FASTA_1, "$in_dir/$cluster_array[$i].fasta" or die "Input file doesn't exist: $in_dir/$cluster_array[$i].fasta\n";
 			while(my $line=<FASTA_1>){
 				chomp $line;
 				
@@ -66,7 +66,7 @@ foreach my $gene_pair(@gene_pair_array){
 				
 				my $id_2="";
 				
-				open FASTA_2, "$in_dir/$cluster_array[$j].fasta";
+				open FASTA_2, "$in_dir/$cluster_array[$j].fasta" or die "Input file doesn't exist: $in_dir/$cluster_array[$j].fasta\n";
 				while(my $line=<FASTA_2>){
 					chomp $line;
 				
@@ -83,7 +83,7 @@ foreach my $gene_pair(@gene_pair_array){
 					}
 				}
 				
-				open OUTPUT, ">$out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j].fasta";
+				open OUTPUT, ">$out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j].fasta" or die "Cannot open output file: $out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j].fasta\n";
 				
 				print OUTPUT ">$rep_1_id\n$rep_1_seq\n>$rep_2_id\n$rep_2_seq\n";
 				
@@ -109,24 +109,24 @@ foreach my $gene_pair(@gene_pair_array){
 					$gene_2_2=$3;
 				}
 				
-				open OUTPUT, ">$out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta";
+				open OUTPUT, ">$out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta" or die "Cannot open output file: $out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta\n";
 				
-				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_1.fasta";
+				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_1.fasta" or die "Cannot open output file: $in_g_dir/$isolate_1/$gene_1_1.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
-				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_2.fasta";
+				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_2.fasta" or die "Cannot open output file: $in_g_dir/$isolate_1/$gene_1_2.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
-				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_1.fasta";
+				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_1.fasta" or die "Cannot open output file: $in_g_dir/$isolate_2/$gene_2_1.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
-				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_2.fasta";
+				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_2.fasta" or die "Cannot open output file: $in_g_dir/$isolate_2/$gene_2_2.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";

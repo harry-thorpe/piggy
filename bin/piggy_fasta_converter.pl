@@ -5,10 +5,10 @@ use strict;
 my $in_file=$ARGV[0];
 my $out_file=$ARGV[1];
 
-open OUTPUT, ">$out_file";
+open OUTPUT, ">$out_file" or die "Cannot open output file: $out_file\n";
 
 my $beg_seq=0;
-open INPUT, "$in_file";
+open INPUT, "$in_file" or die "Input file doesn't exist: $in_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	

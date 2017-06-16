@@ -6,15 +6,15 @@ my $isolate=$ARGV[0];
 my $in_file=$ARGV[1];
 my $out_dir=$ARGV[2];
 
-open OUTPUT_G, ">$out_dir/${isolate}_gene_coordinates.tab";
+open OUTPUT_G, ">$out_dir/${isolate}_gene_coordinates.tab" or die "Cannot open output file: $out_dir/${isolate}_gene_coordinates.tab\n";
 print OUTPUT_G "Name\tGene\tStart\tEnd\tLength\tType\tStrand\tContig\n";
-open OUTPUT_I, ">$out_dir/${isolate}_intergenic_coordinates.tab";
+open OUTPUT_I, ">$out_dir/${isolate}_intergenic_coordinates.tab" or die "Cannot open output file: $out_dir/${isolate}_intergenic_coordinates.tab\n";
 print OUTPUT_I "Name\tGene_name\tStart\tEnd\tLength\tType\tContig\n";
 
 my @gene_array=();
 my %contig_hash_end=();
 
-open INPUT, "$in_file";
+open INPUT, "$in_file" or die "Input file doesn't exist: $in_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	my @line_array=split(/\t/, $line);

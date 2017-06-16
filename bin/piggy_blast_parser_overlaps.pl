@@ -5,7 +5,7 @@ use strict;
 my $in_blast_file=$ARGV[0];
 
 my $hits=0;
-open INPUT, $in_blast_file;
+open INPUT, $in_blast_file or die "Input file doesn't exist: $in_blast_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	my @line_array=split(/\t/, $line);

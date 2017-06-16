@@ -22,11 +22,11 @@ if($cluster_file_rep =~ /^(\S+)\.fasta/){
 	$cluster_file_rep_base=$1;
 }
 
-open OUTPUT, ">$out_file";
+open OUTPUT, ">$out_file" or die "Cannot open output file: $out_file\n";
 
 my @total_cluster_array=();
 
-open INPUT, "$cluster_file";
+open INPUT, "$cluster_file" or die "Input file doesn't exist: $cluster_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	
@@ -37,8 +37,8 @@ while(my $line=<INPUT>){
 close INPUT;
 
 my $cluster_1_pre="NA";
-open OUTPUT_MOD, ">${in_base}_modified.tab";
-open INPUT, "$in_file";
+open OUTPUT_MOD, ">${in_base}_modified.tab" or die "Cannot open output file: ${in_base}_modified.tab\n";
+open INPUT, "$in_file" or die "Input file doesn't exist: $in_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	my @line_array=split(/\t/, $line);
@@ -69,7 +69,7 @@ my $match_end=0;
 
 my %match_hash=();
 
-open INPUT, "${in_base}_modified.tab";
+open INPUT, "${in_base}_modified.tab" or die "Input file doesn't exist: ${in_base}_modified.tab\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	
@@ -110,10 +110,10 @@ while(my $line=<INPUT>){
 				}
 				print OUTPUT "\n";
 				
-				open OUTPUT_MERGE, ">>$out_dir/$merge_cluster_array[0].fasta";
+				open OUTPUT_MERGE, ">>$out_dir/$merge_cluster_array[0].fasta" or die "Cannot open output file: $out_dir/$merge_cluster_array[0].fasta\n";
 				
 				for(my $i=1; $i<$merge_cluster_count; $i++){
-					open INPUT_MERGE, "$out_dir/$merge_cluster_array[$i].fasta";
+					open INPUT_MERGE, "$out_dir/$merge_cluster_array[$i].fasta" or die "Input file doesn't exist: $out_dir/$merge_cluster_array[$i].fasta\n";
 					while(my $line=<INPUT_MERGE>){
 						chomp $line;
 						
@@ -164,7 +164,7 @@ while(my $line=<INPUT>){
 }
 close INPUT;
 
-open OUTPUT_CLU, ">$cluster_file";
+open OUTPUT_CLU, ">$cluster_file" or die "Cannot open output file: $cluster_file\n";
 
 foreach my $cluster(@total_cluster_array){
 	if(!$remove_cluster_hash{$cluster}){
@@ -173,14 +173,14 @@ foreach my $cluster(@total_cluster_array){
 }
 close OUTPUT_CLU;
 
-open OUTPUT_CLU_REP, ">${cluster_file_rep_base}_merged.fasta";
+open OUTPUT_CLU_REP, ">${cluster_file_rep_base}_merged.fasta" or die "Cannot open output file: ${cluster_file_rep_base}_merged.fasta\n";
 
 my $id="";
 my @id_array=();
 my $seq="";
 my $cluster="";
 
-open INPUT, $cluster_file_rep;
+open INPUT, $cluster_file_rep or die "Input file doesn't exist: $cluster_file_rep\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	

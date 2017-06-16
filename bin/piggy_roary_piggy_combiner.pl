@@ -13,7 +13,7 @@ my $method=$ARGV[2];
 print STDOUT "Combining gene and IGR matrices...\n";
 print STDERR "Combining gene and IGR matrices...\n";
 
-open OUTPUT, ">$out_dir/roary_piggy_combined.tab";
+open OUTPUT, ">$out_dir/roary_piggy_combined.tab" or die "Cannot open output file: $out_dir/roary_piggy_combined.tab\n";
 
 my @header_array=();
 my $col_count=0;
@@ -22,7 +22,7 @@ my $isolate_end=0;
 
 my %gene_id_hash=();
 			
-open INPUT_R, "$roary_dir/gene_presence_absence.csv";
+open INPUT_R, "$roary_dir/gene_presence_absence.csv" or die "Input file doesn't exist: $roary_dir/gene_presence_absence.csv\n";
 while(my $line=<INPUT_R>){
 	chomp $line;
 	$line=~s/\R//g;
@@ -62,7 +62,7 @@ while(my $line=<INPUT_R>){
 
 my $int="";
 
-open INPUT_I, "$out_dir/IGR_presence_absence.csv";
+open INPUT_I, "$out_dir/IGR_presence_absence.csv" or die "Input file doesn't exist: $out_dir/IGR_presence_absence.csv\n";
 while(my $line=<INPUT_I>){
 	chomp $line;
 	$line=~s/\R//g;

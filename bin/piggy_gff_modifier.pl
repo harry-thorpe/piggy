@@ -10,12 +10,12 @@ if($in_file =~ /\/([^\/]+)\.gff/){
 	$in_base=$1;
 }
 
-open OUTPUT, ">$in_file.modified";
+open OUTPUT, ">$in_file.modified" or die "Cannot open output file: $in_file.modified\n";
 
 my $include=0;
 my $fir=0;
 
-open INPUT, "$in_file";
+open INPUT, "$in_file" or die "Input file doesn't exist: $in_file\n";
 while(my $line=<INPUT>){
 	chomp $line;
 	
