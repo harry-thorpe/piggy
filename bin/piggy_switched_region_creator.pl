@@ -50,7 +50,7 @@ foreach my $gene_pair(@gene_pair_array){
 				}else{
 					my $seq_1_len=length($line);
 					
-					if($seq_1_len > $rep_1_len){
+					if($seq_1_len > $rep_1_len && $id_1 !~ /_\+_\+_NA_\+_\+_/){
 						$rep_1_seq=$line;
 						$rep_1_len=$seq_1_len;
 						$rep_1_id=$id_1;
@@ -75,7 +75,7 @@ foreach my $gene_pair(@gene_pair_array){
 					}else{
 						my $seq_2_len=length($line);
 					
-						if($seq_2_len > $rep_2_len){
+						if($seq_2_len > $rep_2_len && $id_2 !~ /_\+_\+_NA_\+_\+_/){
 							$rep_2_seq=$line;
 							$rep_2_len=$seq_2_len;
 							$rep_2_id=$id_2;
@@ -111,22 +111,22 @@ foreach my $gene_pair(@gene_pair_array){
 				
 				open OUTPUT, ">$out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta" or die "Cannot open output file: $out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta\n";
 				
-				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_1.fasta" or die "Cannot open output file: $in_g_dir/$isolate_1/$gene_1_1.fasta\n";
+				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_1.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_1/$gene_1_1.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
-				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_2.fasta" or die "Cannot open output file: $in_g_dir/$isolate_1/$gene_1_2.fasta\n";
+				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_2.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_1/$gene_1_2.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
-				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_1.fasta" or die "Cannot open output file: $in_g_dir/$isolate_2/$gene_2_1.fasta\n";
+				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_1.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_2/$gene_2_1.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
 				}
-				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_2.fasta" or die "Cannot open output file: $in_g_dir/$isolate_2/$gene_2_2.fasta\n";
+				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_2.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_2/$gene_2_2.fasta\n";
 				while(my $line=<GENE_FRAG>){
 					
 					print OUTPUT "$line";
