@@ -1,0 +1,175 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Cwd;
+
+sub usage {
+
+print
+"
+Piggy
+
+--in_dir|-i	input directory [default - current directory]
+--out_dir|-o	output directory [default - current directory/piggy_out]
+--roary_dir|-r	directory where roary output is stored [required]
+--threads|-t	threads [default - 1]
+--nuc_id|-n	min percentage nucleotide identity [default - 90]
+--len_id|-l	min percentage length identity [default - 90]
+--method|-m	method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
+--R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
+--fast|-f	fast mode (doesn't align IGRs or detect switched regions) [default - off]
+
+";
+
+exit;
+
+}
+
+if(@ARGV == 0){
+	usage();
+}
+
+# command line options
+my $in_dir=getcwd($0);
+my $out_dir="$in_dir/piggy_out";
+my $roary_dir='';
+my $threads=1;
+my $nuc_identity=90;
+my $len_identity=90;
+my $method="g";
+my $R_plots='';
+my $fast='';
+
+# cdhit nuc_identity
+my $cdhit_nuc_identity=90;
+
+GetOptions(
+	'in_dir|i=s' => \$in_dir,
+	'out_dir|o=s' => \$out_dir,
+	'roary_dir|r=s' => \$roary_dir,
+	'threads|t=i' => \$threads,
+	'nuc_id|n=i' => \$nuc_identity,
+	'len_id|l=i' => \$len_identity,
+	'method|m=s' => \$method,
+	'R_plots|R' => \$R_plots,
+	'fast|f' => \$fast,
+) or die "Piggy died because unknown options were used\n";
+
+# check out_dir
+if(! -e $out_dir && ! -d $out_dir){
+	mkdir $out_dir or die "Cannot create output directory: $out_dir\n";
+}
+
+# check roary_dir
+if(!$roary_dir){
+	die "--roary_dir not specified\n";
+}else{
+	if(! -e $roary_dir && ! -d $roary_dir){
+		die "Roary output directory doesn't exist: $roary_dir\n";
+	}
+}
+
+# check threads
+if($threads !~ /^\d+$/){
+	die "--threads must be an integer\n";
+}
+
+# check nuc_id
+if($nuc_identity !~ /^\d+$/){
+	die "--nuc_id must be an integer\n";
+}else{
+	if($nuc_identity < 80){
+		$cdhit_nuc_identity=80;
+	}
+}
+
+# check len_id
+if($len_identity !~ /^\d+$/){
+	die "--len_id must be an integer\n";
+}
+
+# check method
+if($method !~ /^g|u$/){
+	die "--method must be g or u\n";
+}
+
+# check dependencies
+my $found=0;
+my $cmd_path='';
+
+# try cdhit commands
+my $cdhit_command='';
+my @cdhit_command_array=("cd-hit-est", "cdhit-est");
+foreach my $cmd(@cdhit_command_array){
+	my $cmd_path=`command -v $cmd;`;
+	
+	if($? == 0){
+		$found=1;
+		$cdhit_command=$cmd_path;
+		last;
+	}
+}
+
+if($found == 0){
+	die "Can't find cdhit, tried @cdhit_command_array\n";
+}
+
+# try mafft commands
+$found=0;
+my $mafft_command='';
+my @mafft_command_array=("mafft");
+foreach my $cmd(@mafft_command_array){
+	my $cmd_path=`command -v $cmd;`;
+	
+	if($? == 0){
+		$found=1;
+		$mafft_command=$cmd_path;
+		last;
+	}
+}
+
+if($found == 0){
+	die "Can't find mafft, tried @mafft_command_array\n";
+}
+
+# try blastn commands
+$found=0;
+my $blastn_command='';
+my @blastn_command_array=("blastn");
+foreach my $cmd(@blastn_command_array){
+	my $cmd_path=`command -v $cmd;`;
+	
+	if($? == 0){
+		$found=1;
+		$blastn_command=$cmd_path;
+		last;
+	}
+}
+
+if($found == 0){
+	die "Can't find blastn, tried @blastn_command_array\n";
+}
+
+# try makeblastdb commands
+$found=0;
+my $makeblastdb_command='';
+my @makeblastdb_command_array=("makeblastdb");
+foreach my $cmd(@makeblastdb_command_array){
+	my $cmd_path=`command -v $cmd;`;
+	
+	if($? == 0){
+		$found=1;
+		$makeblastdb_command=$cmd_path;
+		last;
+	}
+}
+
+if($found == 0){
+	die "Can't find makeblastdb, tried @makeblastdb_command_array\n";
+}
+
+
