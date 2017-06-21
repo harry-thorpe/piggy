@@ -98,78 +98,36 @@ if($method !~ /^g|u$/){
 }
 
 # check dependencies
-my $found=0;
-my $cmd_path='';
+my %dep_try_hash=();
+my %dep_cmd_hash=();
 
-# try cdhit commands
-my $cdhit_command='';
-my @cdhit_command_array=("cd-hit-est", "cdhit-est");
-foreach my $cmd(@cdhit_command_array){
-	my $cmd_path=`command -v $cmd;`;
+$dep_try_hash{"cdhit"}{"cd-hit-est"}=1;
+$dep_try_hash{"cdhit"}{"cdhit-est"}=1;
+$dep_try_hash{"mafft"}{"mafft"}=1;
+$dep_try_hash{"blastn"}{"blastn"}=1;
+$dep_try_hash{"makeblastdb"}{"makeblastdb"}=1;
+
+my @dep_array=keys(%dep_try_hash);
+@dep_array=sort(@dep_array);
+
+foreach my $dep(@dep_array){
 	
-	if($? == 0){
-		$found=1;
-		$cdhit_command=$cmd_path;
-		last;
+	my $found=0;
+	my @dep_cmd_array=keys(%{$dep_try_hash{$dep}});
+	@dep_cmd_array=sort(@dep_cmd_array);
+	foreach my $dep_cmd(@dep_cmd_array){
+		my $cmd=`command -v $dep_cmd;`;
+		chomp $cmd;
+	
+		if($? == 0){
+			$found=1;
+			$dep_cmd_hash{$dep}=$cmd;
+			last;
+		}
+	}
+	
+	if($found == 0){
+		die "Can't find $dep, tried @dep_cmd_array\n";
 	}
 }
-
-if($found == 0){
-	die "Can't find cdhit, tried @cdhit_command_array\n";
-}
-
-# try mafft commands
-$found=0;
-my $mafft_command='';
-my @mafft_command_array=("mafft");
-foreach my $cmd(@mafft_command_array){
-	my $cmd_path=`command -v $cmd;`;
-	
-	if($? == 0){
-		$found=1;
-		$mafft_command=$cmd_path;
-		last;
-	}
-}
-
-if($found == 0){
-	die "Can't find mafft, tried @mafft_command_array\n";
-}
-
-# try blastn commands
-$found=0;
-my $blastn_command='';
-my @blastn_command_array=("blastn");
-foreach my $cmd(@blastn_command_array){
-	my $cmd_path=`command -v $cmd;`;
-	
-	if($? == 0){
-		$found=1;
-		$blastn_command=$cmd_path;
-		last;
-	}
-}
-
-if($found == 0){
-	die "Can't find blastn, tried @blastn_command_array\n";
-}
-
-# try makeblastdb commands
-$found=0;
-my $makeblastdb_command='';
-my @makeblastdb_command_array=("makeblastdb");
-foreach my $cmd(@makeblastdb_command_array){
-	my $cmd_path=`command -v $cmd;`;
-	
-	if($? == 0){
-		$found=1;
-		$makeblastdb_command=$cmd_path;
-		last;
-	}
-}
-
-if($found == 0){
-	die "Can't find makeblastdb, tried @makeblastdb_command_array\n";
-}
-
 
