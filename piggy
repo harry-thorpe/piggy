@@ -133,6 +133,7 @@ $dep_try_hash{"cdhit"}{"cdhit-est"}=1;
 $dep_try_hash{"mafft"}{"mafft"}=1;
 $dep_try_hash{"blastn"}{"blastn"}=1;
 $dep_try_hash{"makeblastdb"}{"makeblastdb"}=1;
+$dep_try_hash{"parallel"}{"parallel"}=1;
 
 my @dep_array=keys(%dep_try_hash);
 @dep_array=sort(@dep_array);
@@ -237,19 +238,19 @@ for(my $i=0; $i<$isolate_count; $i+=$threads){
 		push @tmp_isolate_array, $tmp_isolate;
 	}
 	
-	`parallel $piggy_bin_path/piggy_gff_modifier.pl "$out_dir/gff_files/{}.gff" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+	`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_gff_modifier.pl "$out_dir/gff_files/{}.gff" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
 	
 	if($? != 0){
 		die "failed to modify gff files\n";
 	}
 	
-	`parallel $piggy_bin_path/piggy_gene_intergenic_coordinate_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+	`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_gene_intergenic_coordinate_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
 	
 	if($? != 0){
 		die "failed extract IGR coordinates from gff files\n";
 	}
 	
-	`parallel $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+	`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
 	
 	if($? != 0){
 		die "failed to extract IGR sequences from files\n";
@@ -263,6 +264,8 @@ for(my $i=0; $i<$isolate_count; $i+=$threads){
 		if($? != 0){
 			die "failed to concatenate IGR sequences into fasta file\n";
 		}
+		
+		unlink "$out_dir/${tmp_isolate}_IGR_sequences.fasta";
 	}
 	
 	my $real_i=($i + $threads);
