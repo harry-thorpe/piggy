@@ -40,6 +40,6 @@ while(my $line=<INPUT>){
 }
 print OUTPUT "\n";
 
-print STDOUT "$in_base modified.\n";
-print STDERR "$in_base modified.\n";
+#print STDOUT "$in_base modified.\n";
+#print STDERR "$in_base modified.\n";
 

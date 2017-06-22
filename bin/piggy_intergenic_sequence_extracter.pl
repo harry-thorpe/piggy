@@ -14,7 +14,16 @@ my $min_len=30;
 my $max_len=1000;
 my $max_n_prop=0.1;
 
-open OUTPUT, ">>$out_dir/IGR_sequences.fasta" or die "Cannot open output file: $out_dir/IGR_sequences.fasta\n";
+#open OUTPUT, ">>$out_dir/IGR_sequences.fasta" or die "Cannot open output file: $out_dir/IGR_sequences.fasta\n";
+open OUTPUT, ">$out_dir/${isolate}_IGR_sequences.fasta" or die "Cannot open output file: $out_dir/${isolate}_IGR_sequences.fasta\n";
+
+if(! -e "$out_iso_dir" && ! -d "$out_iso_dir"){
+	mkdir "$out_iso_dir" or die "Cannot create output folder: $out_iso_dir\n";
+}
+
+if(! -e "$out_iso_g_dir" && ! -d "$out_iso_g_dir"){
+	mkdir "$out_iso_g_dir" or die "Cannot create output folder: $out_iso_g_dir\n";
+}
 
 my @contig_array=();
 my %contig_hash=();
@@ -137,6 +146,6 @@ foreach $contig(@contig_array){
 	}
 }
 
-print STDOUT "$isolate intergenic sequences extracted.\n";
-print STDERR "$isolate intergenic sequences extracted.\n";
+#print STDOUT "$isolate intergenic sequences extracted.\n";
+#print STDERR "$isolate intergenic sequences extracted.\n";
 

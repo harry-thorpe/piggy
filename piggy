@@ -217,23 +217,56 @@ if(-e "$roary_dir/fixed_input_files" && -d "$roary_dir/fixed_input_files"){
 	}
 }
 
+# initialise IGR file
+`echo "" > "$out_dir/IGR_sequences.fasta"`;
+
 # extract IGR sequences from gff files
-for(my $i=0; $i<$isolate_count; $i++){
-	my $isolate=$isolate_array[$i];
+for(my $i=0; $i<$isolate_count; $i+=$threads){
 	
-	if(! -e "$out_dir/isolate_intergenic_files/$isolate" && ! -d "$out_dir/isolate_intergenic_files/$isolate"){
-		mkdir "$out_dir/isolate_intergenic_files/$isolate" or die "Cannot create output folder: $out_dir/isolate_intergenic_files/$isolate\n";
+	# bundle isolates
+	my $bundle=$threads;
+	if(($i+$threads) >= $isolate_count){
+		$bundle=($isolate_count - $i);
 	}
 	
-	if(! -e "$out_dir/isolate_gene_fragment_files/$isolate" && ! -d "$out_dir/isolate_gene_fragment_files/$isolate"){
-		mkdir "$out_dir/isolate_gene_fragment_files/$isolate" or die "Cannot create output folder: $out_dir/isolate_gene_fragment_files/$isolate\n";
+	my @tmp_isolate_array=();
+	
+	for(my $j=$i; $j<($i+$threads); $j++){
+	
+		my $tmp_isolate=$isolate_array[$j];
+		push @tmp_isolate_array, $tmp_isolate;
 	}
 	
-	`$piggy_bin_path/piggy_gff_modifier.pl "$out_dir/gff_files/$isolate.gff" >> "$out_dir/log.txt"`;
+	`parallel $piggy_bin_path/piggy_gff_modifier.pl "$out_dir/gff_files/{}.gff" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
 	
-	`$piggy_bin_path/piggy_gene_intergenic_coordinate_extracter.pl "$isolate" "$out_dir/gff_files/$isolate.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt"`;
+	if($? != 0){
+		die "failed to modify gff files\n";
+	}
 	
-	`$piggy_bin_path/piggy_intergenic_sequence_extracter.pl "$isolate" "$out_dir/gff_files/$isolate.gff.modified" "$out_dir/coordinate_files/${isolate}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/$isolate" "$out_dir/coordinate_files/${isolate}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/$isolate" >> "$out_dir/log.txt"`;
+	`parallel $piggy_bin_path/piggy_gene_intergenic_coordinate_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+	
+	if($? != 0){
+		die "failed extract IGR coordinates from gff files\n";
+	}
+	
+	`parallel $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+	
+	if($? != 0){
+		die "failed to extract IGR sequences from files\n";
+	}
+	
+	for(my $j=$i; $j<($i+$threads); $j++){
+		
+		my $tmp_isolate=$isolate_array[$j];
+		`cat "$out_dir/${tmp_isolate}_IGR_sequences.fasta" >> "$out_dir/IGR_sequences.fasta"`;
+		
+		if($? != 0){
+			die "failed to concatenate IGR sequences into fasta file\n";
+		}
+	}
+	
+	my $real_i=($i + $threads);
+	print "$real_i/$isolate_count gff files processed\n";
 }
 
 # cluster IGRs
