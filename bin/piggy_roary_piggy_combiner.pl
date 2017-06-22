@@ -98,7 +98,7 @@ while(my $line=<INPUT_I>){
 					my $tmp_gene_1=$gene_id_hash{$isolate}{$int_id_array[1]};
 					my $tmp_gene_2=$gene_id_hash{$isolate}{$int_id_array[2]};
 					
-					if($method eq "GENE_PAIR"){
+					if($method eq "g"){
 						
 						if($int_id_array[3] eq "CO_F"){
 							$tmp_gene_2="*$tmp_gene_2";
@@ -116,7 +116,7 @@ while(my $line=<INPUT_I>){
 		
 						$int_gene_hash{$tmp_gene_1_2}++;
 						
-					}elsif($method eq "UPSTREAM"){
+					}elsif($method eq "u"){
 						
 						if($int_id_array[3] eq "CO_F"){
 							$tmp_gene_2="*$tmp_gene_2";

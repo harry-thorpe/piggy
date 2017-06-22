@@ -1,0 +1,537 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+use Cwd;
+use File::Copy;
+
+sub usage {
+
+print
+"
+Piggy
+
+--in_dir|-i	input folder [default - current folder]
+--out_dir|-o	output folder [default - current folder/piggy_out]
+--roary_dir|-r	folder where roary output is stored [required]
+--threads|-t	threads [default - 1]
+--nuc_id|-n	min percentage nucleotide identity [default - 90]
+--len_id|-l	min percentage length identity [default - 90]
+--method|-m	method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
+--R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
+--fast|-f	fast mode (doesn't align IGRs or detect switched regions) [default - off]
+
+";
+
+exit;
+
+}
+
+if(@ARGV == 0){
+	usage();
+}
+
+my $piggy_cmd=$0;
+my $piggy_path='';
+if($piggy_cmd =~ /^(.+)\/[^\/]+$/){
+	$piggy_path=$1;
+	print "$piggy_path\n";
+}else{
+	die "can't find piggy path\n";
+}
+my $piggy_bin_path="${piggy_path}/bin";
+print "$piggy_bin_path\n";
+
+# command line options
+my $in_dir=getcwd($0);
+my $out_dir="$in_dir/piggy_out";
+my $roary_dir='';
+my $threads=1;
+my $nuc_identity=90;
+my $len_identity=90;
+my $method="g";
+my $R_plots=0;
+my $fast=0;
+
+# cdhit nuc_identity
+my $cdhit_nuc_identity=90;
+
+GetOptions(
+	'in_dir|i=s' => \$in_dir,
+	'out_dir|o=s' => \$out_dir,
+	'roary_dir|r=s' => \$roary_dir,
+	'threads|t=i' => \$threads,
+	'nuc_id|n=i' => \$nuc_identity,
+	'len_id|l=i' => \$len_identity,
+	'method|m=s' => \$method,
+	'R_plots|R' => \$R_plots,
+	'fast|f' => \$fast,
+) or die "Piggy died because unknown options were used\n";
+
+# check out_dir
+if(! -e $out_dir && ! -d $out_dir){
+	mkdir $out_dir or die "Cannot create output folder: $out_dir\n";
+}
+
+# check roary_dir
+if(!$roary_dir){
+	die "--roary_dir not specified\n";
+}else{
+	if(! -e $roary_dir && ! -d $roary_dir){
+		die "Roary output folder doesn't exist: $roary_dir\n";
+	}
+}
+
+# check threads
+if($threads !~ /^\d+$/){
+	die "--threads must be an integer\n";
+}
+
+# check nuc_id
+if($nuc_identity !~ /^\d+$/){
+	die "--nuc_id must be an integer\n";
+}else{
+	$nuc_identity=($nuc_identity/100);
+	$cdhit_nuc_identity=$nuc_identity;
+	
+	if($cdhit_nuc_identity < 0.8){
+		$cdhit_nuc_identity=0.8;
+	}
+}
+
+# check len_id
+if($len_identity !~ /^\d+$/){
+	die "--len_id must be an integer\n";
+}else{
+	$len_identity=($len_identity/100);
+}
+
+# check method
+if($method !~ /^g|u$/){
+	die "--method must be g or u\n";
+}
+
+# open log file
+open LOG, ">$out_dir/log.txt" or die "Cannot create log file: $out_dir/log.txt\n";
+
+# check dependencies
+my %dep_try_hash=();
+my %dep_cmd_hash=();
+
+$dep_try_hash{"cdhit"}{"cd-hit-est"}=1;
+$dep_try_hash{"cdhit"}{"cdhit-est"}=1;
+$dep_try_hash{"mafft"}{"mafft"}=1;
+$dep_try_hash{"blastn"}{"blastn"}=1;
+$dep_try_hash{"makeblastdb"}{"makeblastdb"}=1;
+
+my @dep_array=keys(%dep_try_hash);
+@dep_array=sort(@dep_array);
+
+# assign dependency commands to hash
+foreach my $dep(@dep_array){
+	
+	my $found=0;
+	my @dep_cmd_array=keys(%{$dep_try_hash{$dep}});
+	@dep_cmd_array=sort(@dep_cmd_array);
+	foreach my $dep_cmd(@dep_cmd_array){
+		my $cmd=`command -v $dep_cmd;`;
+		chomp $cmd;
+	
+		if($? == 0){
+			$found=1;
+			$dep_cmd_hash{$dep}=$cmd;
+			print "$dep found, command: $cmd\n";
+			last;
+		}
+	}
+	
+	if($found == 0){
+		die "Can't find $dep, tried @dep_cmd_array\n";
+	}
+}
+
+# check in_dir contains gff files
+my @isolate_array=();
+my $isolate_count=0;
+
+open OUTPUT, ">$out_dir/isolates.txt" or die "Cannot open output file: $out_dir/isolates.txt\n";
+opendir(my $dh, $in_dir);
+while(readdir $dh){
+	my $file=$_;
+	
+	if($file =~ /(\S+)\.gff$/){
+		my $isolate=$1;
+		
+		push @isolate_array, $isolate;
+		$isolate_count++;
+		print OUTPUT "$isolate\n";
+	}
+}
+closedir $dh;
+close OUTPUT;
+
+@isolate_array=sort(@isolate_array);
+
+if($isolate_count > 0){
+	print "$isolate_count isolates found\n";
+}else{
+	die "$isolate_count isolates found\n";
+}
+
+# open output directories
+if(! -e "$out_dir/coordinate_files" && ! -d "$out_dir/coordinate_files"){
+	mkdir "$out_dir/coordinate_files" or die "Cannot create output folder: $out_dir/coordinate_files\n";
+}
+
+if(! -e "$out_dir/isolate_intergenic_files" && ! -d "$out_dir/isolate_intergenic_files"){
+	mkdir "$out_dir/isolate_intergenic_files" or die "Cannot create output folder: $out_dir/isolate_intergenic_files\n";
+}
+
+if(! -e "$out_dir/isolate_gene_fragment_files" && ! -d "$out_dir/isolate_gene_fragment_files"){
+	mkdir "$out_dir/isolate_gene_fragment_files" or die "Cannot create output folder: $out_dir/isolate_gene_fragment_files\n";
+}
+
+if(! -e "$out_dir/gff_files" && ! -d "$out_dir/gff_files"){
+	mkdir "$out_dir/gff_files" or die "Cannot create output folder: $out_dir/gff_files\n";
+}
+
+# copy gff files to new folder
+foreach my $isolate(@isolate_array){
+	copy("$in_dir/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff files\n";
+}
+
+# copy roary-fixed gff files to new folder - now all should be original or fixed
+if(-e "$roary_dir/fixed_input_files" && -d "$roary_dir/fixed_input_files"){
+	foreach my $isolate(@isolate_array){
+		copy("$roary_dir/fixed_input_files/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff files\n";
+	}
+}
+
+# extract IGR sequences from gff files
+for(my $i=0; $i<$isolate_count; $i++){
+	my $isolate=$isolate_array[$i];
+	
+	if(! -e "$out_dir/isolate_intergenic_files/$isolate" && ! -d "$out_dir/isolate_intergenic_files/$isolate"){
+		mkdir "$out_dir/isolate_intergenic_files/$isolate" or die "Cannot create output folder: $out_dir/isolate_intergenic_files/$isolate\n";
+	}
+	
+	if(! -e "$out_dir/isolate_gene_fragment_files/$isolate" && ! -d "$out_dir/isolate_gene_fragment_files/$isolate"){
+		mkdir "$out_dir/isolate_gene_fragment_files/$isolate" or die "Cannot create output folder: $out_dir/isolate_gene_fragment_files/$isolate\n";
+	}
+	
+	`$piggy_bin_path/piggy_gff_modifier.pl "$out_dir/gff_files/$isolate.gff" >> "$out_dir/log.txt"`;
+	
+	`$piggy_bin_path/piggy_gene_intergenic_coordinate_extracter.pl "$isolate" "$out_dir/gff_files/$isolate.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt"`;
+	
+	`$piggy_bin_path/piggy_intergenic_sequence_extracter.pl "$isolate" "$out_dir/gff_files/$isolate.gff.modified" "$out_dir/coordinate_files/${isolate}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/$isolate" "$out_dir/coordinate_files/${isolate}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/$isolate" >> "$out_dir/log.txt"`;
+}
+
+# cluster IGRs
+print "Clustering IGRs with cd-hit...\n"; print LOG "Clustering IGRs with cd-hit...\n";
+
+`$dep_cmd_hash{"cdhit"} -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0`;
+
+if($? != 0){
+	die "IGR clustering failed\n";
+}else{
+	print "IGRs clustered\n"; print LOG "IGRs clustered\n";
+}
+
+# make IGR cluster output folders
+if(! -e "$out_dir/cluster_intergenic_files" && ! -d "$out_dir/cluster_intergenic_files"){
+	mkdir "$out_dir/cluster_intergenic_files" or die "Cannot create output folder: $out_dir/cluster_intergenic_files\n";
+}
+
+if(! -e "$out_dir/cluster_intergenic_alignment_files" && ! -d "$out_dir/cluster_intergenic_alignment_files"){
+	mkdir "$out_dir/cluster_intergenic_alignment_files" or die "Cannot create output folder: $out_dir/cluster_intergenic_alignment_files\n";
+}
+
+if(! -e "$out_dir/cluster_representative_files" && ! -d "$out_dir/cluster_representative_files"){
+	mkdir "$out_dir/cluster_representative_files" or die "Cannot create output folder: $out_dir/cluster_representative_files\n";
+}
+
+# make IGR cluster output files
+`$piggy_bin_path/piggy_cluster_file_creator.pl "$out_dir" >> "$out_dir/log.txt"`;
+
+if($? != 0){
+	die "failed to create IGR cluster files\n";
+}
+
+# do all-vs-all IGR cluster blast search
+print "Doing all-vs-all IGR cluster blast search...\n"; print LOG "Doing all-vs-all IGR cluster blast search...\n";
+
+`$dep_cmd_hash{"makeblastdb"} -in "$out_dir/representative_clusters.fasta" -out "$out_dir/representative_clusters_db" -dbtype nucl`;
+
+if($? != 0){
+	die "failed to create blast db\n";
+}
+
+`$dep_cmd_hash{"blastn"} -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -task blastn -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore"`;
+
+if($? != 0){
+	die "failed to do all-vs-all IGR cluster blast search\n";
+}else{
+	print "all-vs-all IGR cluster blast search completed\n";
+}
+
+# merge IGR clusters
+`$piggy_bin_path/piggy_cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta" "$nuc_identity" "$len_identity"`;
+
+if($? != 0){
+	die "failed to merge IGR clusters\n";
+}
+
+# count clusters
+my @cluster_array=();
+my $cluster_count=0;
+
+open CLU, "$out_dir/clusters.txt" or die "Input file doesn't exist: $out_dir/clusters.txt\n";
+while(my $line=<CLU>){
+	chomp $line;
+	
+	push @cluster_array, $line;
+	$cluster_count++;
+}
+close CLU;
+
+if($cluster_count > 0){
+	print "$cluster_count IGR clusters found after merging\n";
+}else{
+	die "$cluster_count IGR clusters found after merging\n";
+}
+
+# produce IGR presence absence matrix
+`$piggy_bin_path/piggy_cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"`;
+
+if($? != 0){
+	die "failed to produce IGR presence absence matrix\n";
+}
+
+# combine gene and IGR matrices
+`$piggy_bin_path/piggy_roary_piggy_combiner.pl "$out_dir" "$roary_dir" "$method" >> "$out_dir/log.txt"`;
+
+if($? != 0){
+	die "failed to combine gene and IGR matrices\n";
+}
+
+if($fast == 0){
+
+# align IGR clusters
+print "Aligning IGR clusters...\n"; print LOG "Aligning IGR clusters...\n";
+
+for(my $i=0; $i<$cluster_count; $i++){
+	my $cluster=$cluster_array[$i];
+	
+	my $seq_count=0;
+	open CLU, "$out_dir/cluster_intergenic_files/${cluster}.fasta" or die "Input file doesn't exist: $out_dir/cluster_intergenic_files/${cluster}.fasta\n";
+	while(my $line=<CLU>){
+		chomp $line;
+	
+		if($line =~ /^>/){
+			$seq_count++;
+		}
+	}
+	close CLU;
+	
+	if($seq_count > 1){
+		`$dep_cmd_hash{"mafft"} --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null`;
+		#`$dep_cmd_hash{"mafft"} --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/cluster_intergenic_files/${cluster}.fasta" 1> "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" 2> /dev/null`;
+		
+		if($? != 0){
+			die "failed to align $out_dir/cluster_intergenic_files/${cluster}.fasta\n";
+		}
+		
+		`$piggy_bin_path/piggy_fasta_converter.pl "$out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta" "$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta"`;
+		
+		if($? != 0){
+			die "failed to convert $out_dir/cluster_intergenic_files/${cluster}_aligned_tmp.fasta\n";
+		}
+		
+		copy("$out_dir/cluster_intergenic_files/${cluster}_aligned.fasta", "$out_dir/cluster_intergenic_alignment_files/${cluster}_aligned.fasta");
+	}else{
+		copy("$out_dir/cluster_intergenic_files/${cluster}.fasta", "$out_dir/cluster_intergenic_alignment_files/${cluster}_aligned.fasta");
+	}
+	
+	my $rem=($i % 100);
+	if($rem == 0 && $i > 0){
+		print "$i / $cluster_count IGR clusters aligned.\n";
+	}
+}
+
+# calculate IGR divergences
+print "Calculating IGR divergences...\n"; print LOG "Calculating IGR divergences...\n";
+
+`$piggy_bin_path/piggy_divergence_checker.pl "$out_dir/cluster_intergenic_alignment_files" "$out_dir" "cluster_IGR_divergences.csv"`;
+
+if($? != 0){
+	die "failed to calculate IGR divergences\n";
+}else{
+	print "IGR divergences calculated.\n"; print LOG "IGR divergences calculated.\n";
+}
+
+# produce core IGR alignment
+`$piggy_bin_path/piggy_core_alignment_creator.pl "$out_dir" >> "$out_dir/log.txt"`;
+
+if($? != 0){
+	die "failed to create core IGR alignment\n";
+}
+
+# produce switched region files
+if(! -e "$out_dir/switched_region_alignment_files" && ! -d "$out_dir/switched_region_alignment_files"){
+	mkdir "$out_dir/switched_region_alignment_files" or die "Cannot create output folder: $out_dir/switched_region_alignment_files\n";
+}
+
+if(! -e "$out_dir/switched_region_files" && ! -d "$out_dir/switched_region_files"){
+	mkdir "$out_dir/switched_region_files" or die "Cannot create output folder: $out_dir/switched_region_files\n";
+}
+
+`$piggy_bin_path/piggy_switched_region_creator.pl "$out_dir/roary_piggy_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" "$out_dir/isolate_gene_fragment_files" >> "$out_dir/log.txt"`;
+
+if($? != 0){
+	die "failed to detect candidate switched IGRs\n";
+}
+
+# count switched regions
+my @switched_region_array=();
+my $switched_region_count=0;
+
+open SR, "$out_dir/switched_regions.txt" or die "Input file doesn't exist: $out_dir/switched_regions.txt\n";
+while(my $line=<SR>){
+	chomp $line;
+	
+	push @switched_region_array, $line;
+	$switched_region_count++;
+}
+close SR;
+
+# align candidate switched IGRs
+print "Aligning candidate switched IGRs...\n"; print LOG "Aligning candidate switched IGRs...\n";
+
+for(my $i=0; $i<$switched_region_count; $i++){
+	my $switched_region=$switched_region_array[$i];
+	
+	# blast to check for gene overlaps
+	`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}_gene_fragments.fasta" -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
+	
+	if($? != 0){
+		die "failed to do overlap blast search on $out_dir/switched_region_files/${switched_region}.fasta\n";
+	}
+	
+	my $blast_hit=`$piggy_bin_path/piggy_blast_parser_overlaps.pl "$out_dir/blast_out.tab"`;
+	
+	if($? != 0){
+		die "failed to parse blast output of $out_dir/blast_out.tab\n";
+	}
+	
+	unlink "$out_dir/blast_out.tab";
+	
+	# if there are no overlaps
+	if($blast_hit eq "no_hit"){
+		# blast to find homology between candidate switched IGRs
+		`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
+		
+		if($? != 0){
+			die "failed to do blast search on $out_dir/switched_region_files/${switched_region}.fasta\n";
+		}
+		
+		$blast_hit=`$piggy_bin_path/piggy_blast_parser.pl "$out_dir/blast_out.tab" "$out_dir/switched_region_files/${switched_region}.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"`;
+		
+		if($? != 0){
+			die "failed to parse blast output of $out_dir/blast_out.tab\n";
+		}
+		
+		unlink "$out_dir/blast_out.tab";
+	
+		if($blast_hit eq "hit"){
+			`$dep_cmd_hash{"mafft"} --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null`;
+			#`$dep_cmd_hash{"mafft"} --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null`;
+			
+			if($? != 0){
+				die "failed to align $out_dir/switched_region_files/${switched_region}.fasta\n";
+			}
+			
+			`$piggy_bin_path/piggy_fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"`;
+			
+			if($? != 0){
+				die "failed to convert $out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta\n";
+			}
+		}
+	
+		copy("$out_dir/switched_region_files/${switched_region}_aligned.fasta", "$out_dir/switched_region_alignment_files/${switched_region}_aligned.fasta");
+	}
+}
+
+print "Candidate switched IGRs aligned.\n"; print LOG "Candidate switched IGRs aligned.\n";
+
+print "Calculating candidate switched IGR divergences...\n"; print LOG "Calculating candidate switched IGR divergences...\n";
+
+`$piggy_bin_path/piggy_divergence_checker.pl "$out_dir/switched_region_alignment_files" "$out_dir" "switched_region_divergences.csv"`;
+
+if($? != 0){
+	die "failed to calculate switched IGR divergences\n";
+}else{
+	print "candidate switched IGR divergences calculated.\n"; print LOG "candidate switched IGR divergences calculated.\n";
+}
+
+if($R_plots == 1){
+	print "Making switched IGR R plots.\n"; print LOG "Making switched IGR R plots.\n";
+
+	# Needs R, Rscript, ggplot2, reshape2.
+
+	`piggy_SR_plotter.R "$out_dir" "$nuc_identity" "$len_identity" &> /dev/null`;
+	
+	if($? != 0){
+		print "warning: R script didn't execute correctly\n";
+	}
+}
+
+}
+
+if($R_plots == 1){
+	print "Making general R plots.\n"; print LOG "Making general R plots.\n";
+
+	# Needs R, Rscript, ggplot2, reshape2.
+
+	`piggy_R_plotter.R "$out_dir" "$roary_dir" &> /dev/null`;
+	
+	if($? != 0){
+		print "warning: R script didn't execute correctly\n";
+	}
+}
+
+# cleanup
+
+if($R_plots == 1){
+	if(! -e "$out_dir/plots" && ! -d "$out_dir/plots"){
+		mkdir "$out_dir/plots";
+	}
+	`mv $out_dir/*.tif $out_dir/plots`;
+}
+
+if($fast == 0){
+	`rm -r "$out_dir/switched_region_files"`;
+	`rm -r "$out_dir/isolate_core_IGR_tmp"`;
+	
+	`rm "$out_dir/switched_regions.txt"`;
+}
+
+`rm -r "$out_dir/coordinate_files"`;
+`rm -r "$out_dir/isolate_intergenic_files"`;
+`rm -r "$out_dir/isolate_gene_fragment_files"`;
+`rm -r "$out_dir/cluster_intergenic_files"`;
+`rm -r "$out_dir/cluster_representative_files"`;
+
+`rm "$out_dir/clusters.txt"`;
+`rm "$out_dir/isolates.txt"`;
+`rm "$out_dir/representative_clusters_db.nhr"`;
+`rm "$out_dir/representative_clusters_db.nin"`;
+`rm "$out_dir/representative_clusters_db.nsq"`;
+`rm "$out_dir/representative_clusters_merged.tab"`;
+`rm "$out_dir/representative_clusters.fasta"`;
+`rm "$out_dir/representative_clusters_blast_out.tab"`;
+`rm "$out_dir/representative_clusters_blast_out_modified.tab"`;
+`rm "$out_dir/IGR_sequences_clustered.fasta"`;
+`rm "$out_dir/IGR_sequences_clustered.fasta.clstr"`;
+

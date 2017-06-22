@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/usr/bin/env Rscript
 
 is.installed <- function(mypkg) is.element(mypkg, installed.packages()[,1]) 
 

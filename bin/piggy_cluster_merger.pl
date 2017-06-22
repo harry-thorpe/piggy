@@ -10,6 +10,9 @@ my $cluster_file_rep=$ARGV[4];
 my $nuc_identity=$ARGV[5];
 my $len_identity=$ARGV[6];
 
+print STDOUT "Merging IGR clusters...\n";
+print STDERR "Merging IGR clusters...\n";
+
 my $in_base="";
 
 if($in_file =~ /^(\S+)\.tab/){
@@ -198,4 +201,7 @@ while(my $line=<INPUT>){
 	}
 }
 close INPUT;
+
+print STDOUT "IGR clusters merged\n";
+print STDERR "IGR clusters merged\n";
 

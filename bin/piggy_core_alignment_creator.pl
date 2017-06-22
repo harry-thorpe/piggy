@@ -4,6 +4,9 @@ use strict;
 
 my $out_dir=$ARGV[0];
 
+print STDOUT "Creating core IGR alignment.\n";
+print STDERR "Creating core IGR alignment.\n";
+
 open OUTPUT, ">$out_dir/core_IGR_alignment.fasta" or die "Cannot open output file: $out_dir/core_IGR_alignment.fasta\n";
 
 mkdir "$out_dir/isolate_core_IGR_tmp";
@@ -95,4 +98,7 @@ foreach my $isolate(@isolate_array){
 }
 close INPUT;
 close OUTPUT;
+
+print STDOUT "core IGR alignment created.\n";
+print STDERR "core IGR alignment created.\n";
 
