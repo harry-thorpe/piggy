@@ -22,6 +22,7 @@ Piggy
 --method|-m	method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
 --R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
 --fast|-f	fast mode (doesn't align IGRs or detect switched regions) [default - off]
+--help|-h	help
 
 ";
 
@@ -54,6 +55,7 @@ my $len_identity=90;
 my $method="g";
 my $R_plots=0;
 my $fast=0;
+my $help=0;
 
 # cdhit nuc_identity
 my $cdhit_nuc_identity=90;
@@ -68,7 +70,13 @@ GetOptions(
 	'method|m=s' => \$method,
 	'R_plots|R' => \$R_plots,
 	'fast|f' => \$fast,
+	'help|h' => \$help,
 ) or die "Piggy died because unknown options were used\n";
+
+# check help
+if($help == 1){
+	usage();
+}
 
 # check out_dir
 if(! -e $out_dir && ! -d $out_dir){
