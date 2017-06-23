@@ -512,6 +512,10 @@ for(my $i=0; $i<$switched_region_count; $i++){
 	
 		copy("$out_dir/switched_region_files/${switched_region}_aligned.fasta", "$out_dir/switched_region_alignment_files/${switched_region}_aligned.fasta");
 	}
+	
+	if($i > 0 && ($i % $switched_region_count == 0)){
+		print "$i/$switched_region_count candidate switched IGRs aligned\n";
+	}
 }
 
 print "Candidate switched IGRs aligned.\n"; print LOG "Candidate switched IGRs aligned.\n";
