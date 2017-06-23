@@ -214,7 +214,9 @@ foreach my $isolate(@isolate_array){
 # copy roary-fixed gff files to new folder - now all should be original or fixed
 if(-e "$roary_dir/fixed_input_files" && -d "$roary_dir/fixed_input_files"){
 	foreach my $isolate(@isolate_array){
-		copy("$roary_dir/fixed_input_files/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff file - $roary_dir/fixed_input_files ${isolate}.gff\n";
+		if(-e "$roary_dir/fixed_input_files/${isolate}.gff"){
+			copy("$roary_dir/fixed_input_files/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff file - $roary_dir/fixed_input_files/${isolate}.gff\n";
+		}
 	}
 }
 
