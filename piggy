@@ -208,13 +208,13 @@ if(! -e "$out_dir/gff_files" && ! -d "$out_dir/gff_files"){
 
 # copy gff files to new folder
 foreach my $isolate(@isolate_array){
-	copy("$in_dir/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff files\n";
+	copy("$in_dir/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff file - $in_dir/${isolate}.gff\n";
 }
 
 # copy roary-fixed gff files to new folder - now all should be original or fixed
 if(-e "$roary_dir/fixed_input_files" && -d "$roary_dir/fixed_input_files"){
 	foreach my $isolate(@isolate_array){
-		copy("$roary_dir/fixed_input_files/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff files\n";
+		copy("$roary_dir/fixed_input_files/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff file - $roary_dir/fixed_input_files ${isolate}.gff\n";
 	}
 }
 
