@@ -496,8 +496,8 @@ for(my $i=0; $i<$switched_region_count; $i++){
 		unlink "$out_dir/blast_out.tab";
 	
 		if($blast_hit eq "hit"){
-			`$dep_cmd_hash{"mafft"} --thread "$threads" --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null`;
-			#`$dep_cmd_hash{"mafft"} --thread "$threads" --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null`;
+			`$dep_cmd_hash{"mafft"} --thread 1 --retree 2 --maxiterate 0 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null`;
+			#`$dep_cmd_hash{"mafft"} --thread 1 --localpair --maxiterate 1000 --adjustdirection --quiet "$out_dir/switched_region_files/${switched_region}.fasta" 1> "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" 2> /dev/null`;
 			
 			if($? != 0){
 				die "failed to align $out_dir/switched_region_files/${switched_region}.fasta\n";
@@ -531,7 +531,7 @@ if($R_plots == 1){
 
 	# Needs R, Rscript, ggplot2, reshape2.
 
-	`piggy_SR_plotter.R "$out_dir" "$nuc_identity" "$len_identity" &> /dev/null`;
+	`$piggy_bin_path/piggy_SR_plotter.R "$out_dir" "$nuc_identity" "$len_identity" &> /dev/null`;
 	
 	if($? != 0){
 		print "warning: R script didn't execute correctly\n";
@@ -545,7 +545,7 @@ if($R_plots == 1){
 
 	# Needs R, Rscript, ggplot2, reshape2.
 
-	`piggy_R_plotter.R "$out_dir" "$roary_dir" &> /dev/null`;
+	`$piggy_bin_path/piggy_R_plotter.R "$out_dir" "$roary_dir" &> /dev/null`;
 	
 	if($? != 0){
 		print "warning: R script didn't execute correctly\n";
