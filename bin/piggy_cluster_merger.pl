@@ -149,12 +149,12 @@ while(my $line=<INPUT>){
 		if($cluster_1 =~ /^(Cluster_)(\d+)/){
 			my $cluster_header=$1;my $cluster_1_no=$2;
 			
-			my $cluster_1="$cluster_header$cluster_1_no";
+			$cluster_1="$cluster_header$cluster_1_no";
 			
 			if($cluster_2 =~ /^(Cluster_)(\d+)/){
 				$cluster_header=$1;my $cluster_2_no=$2;
 			
-				my $cluster_2="$cluster_header$cluster_2_no";
+				$cluster_2="$cluster_header$cluster_2_no";
 				
 				if($cluster_1 ne $cluster_2 && $match_pcn >= $nuc_identity && $cluster_1_no < $cluster_2_no){
 					for(my $i=$match_sta; $i<=$match_end; $i++){
