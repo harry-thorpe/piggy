@@ -206,7 +206,6 @@ if(! -e "$out_dir/gff_files" && ! -d "$out_dir/gff_files"){
 	mkdir "$out_dir/gff_files" or die "Cannot create output folder: $out_dir/gff_files\n";
 }
 
-# copy gff files to new folder
 foreach my $isolate(@isolate_array){
 	copy("$in_dir/${isolate}.gff", "$out_dir/gff_files") or die "Cannot copy gff file - $in_dir/${isolate}.gff\n";
 }
