@@ -30,6 +30,9 @@ exit;
 
 }
 
+# switch off buffering
+#$| = 1;
+
 if(@ARGV == 0){
 	usage();
 }
@@ -123,6 +126,7 @@ if($method !~ /^g|u$/){
 
 # open log file
 open LOG, ">$out_dir/log.txt" or die "Cannot create log file: $out_dir/log.txt\n";
+my $stderr='';
 
 # check dependencies
 my %dep_try_hash=();
@@ -234,19 +238,19 @@ for(my $i=0; $i<$isolate_count; $i++){
 	
 	if(($tmp_isolate_count == $threads) or ($tmp_isolate_count > 0 && ($i + 1 == $isolate_count))){
 	
-		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_gff_modifier.pl "$out_dir/gff_files/{}.gff" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_gff_modifier.pl "$out_dir/gff_files/{}.gff" ::: @tmp_isolate_array`;
 	
 		if($? != 0){
 			die "failed to modify gff files\n";
 		}
 	
-		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_gene_intergenic_coordinate_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_gene_intergenic_coordinate_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files" ::: @tmp_isolate_array`;
 	
 		if($? != 0){
 			die "failed extract IGR coordinates from gff files\n";
 		}
 	
-		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" >> "$out_dir/log.txt" ::: @tmp_isolate_array`;
+		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" ::: @tmp_isolate_array`;
 	
 		if($? != 0){
 			die "failed to extract IGR sequences from files\n";
@@ -296,10 +300,12 @@ if(! -e "$out_dir/cluster_representative_files" && ! -d "$out_dir/cluster_repres
 }
 
 # make IGR cluster output files
-`$piggy_bin_path/piggy_cluster_file_creator.pl "$out_dir" >> "$out_dir/log.txt"`;
+$stderr=`$piggy_bin_path/piggy_cluster_file_creator.pl "$out_dir"`;
 
 if($? != 0){
 	die "failed to create IGR cluster files\n";
+}else{
+	print LOG "$stderr";
 }
 
 # do all-vs-all IGR cluster blast search
@@ -320,10 +326,12 @@ if($? != 0){
 }
 
 # merge IGR clusters
-`$piggy_bin_path/piggy_cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta" "$nuc_identity" "$len_identity"`;
+$stderr=`$piggy_bin_path/piggy_cluster_merger.pl "$out_dir/representative_clusters_blast_out.tab" "$out_dir/representative_clusters_merged.tab" "$out_dir/cluster_intergenic_files" "$out_dir/clusters.txt" "$out_dir/representative_clusters.fasta" "$nuc_identity" "$len_identity"`;
 
 if($? != 0){
 	die "failed to merge IGR clusters\n";
+}else{
+	print LOG "$stderr";
 }
 
 # count clusters
@@ -346,17 +354,21 @@ if($cluster_count > 0){
 }
 
 # produce IGR presence absence matrix
-`$piggy_bin_path/piggy_cluster_presence_absence.pl "$out_dir" >> "$out_dir/log.txt"`;
+$stderr=`$piggy_bin_path/piggy_cluster_presence_absence.pl "$out_dir"`;
 
 if($? != 0){
 	die "failed to produce IGR presence absence matrix\n";
+}else{
+	print LOG "$stderr";
 }
 
 # combine gene and IGR matrices
-`$piggy_bin_path/piggy_roary_piggy_combiner.pl "$out_dir" "$roary_dir" "$method" >> "$out_dir/log.txt"`;
+$stderr=`$piggy_bin_path/piggy_roary_piggy_combiner.pl "$out_dir" "$roary_dir" "$method"`;
 
 if($? != 0){
 	die "failed to combine gene and IGR matrices\n";
+}else{
+	print LOG "$stderr";
 }
 
 if($fast == 0){
@@ -424,10 +436,12 @@ if($? != 0){
 }
 
 # produce core IGR alignment
-`$piggy_bin_path/piggy_core_alignment_creator.pl "$out_dir" >> "$out_dir/log.txt"`;
+$stderr=`$piggy_bin_path/piggy_core_alignment_creator.pl "$out_dir"`;
 
 if($? != 0){
 	die "failed to create core IGR alignment\n";
+}else{
+	print LOG "$stderr";
 }
 
 # produce switched region files
@@ -439,10 +453,12 @@ if(! -e "$out_dir/switched_region_files" && ! -d "$out_dir/switched_region_files
 	mkdir "$out_dir/switched_region_files" or die "Cannot create output folder: $out_dir/switched_region_files\n";
 }
 
-`$piggy_bin_path/piggy_switched_region_creator.pl "$out_dir/roary_piggy_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" "$out_dir/isolate_gene_fragment_files" >> "$out_dir/log.txt"`;
+$stderr=`$piggy_bin_path/piggy_switched_region_creator.pl "$out_dir/roary_piggy_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" "$out_dir/isolate_gene_fragment_files"`;
 
 if($? != 0){
 	die "failed to detect candidate switched IGRs\n";
+}else{
+	print LOG "$stderr";
 }
 
 # count switched regions
