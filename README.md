@@ -12,6 +12,7 @@ Piggy has a number of dependencies:
 To install Piggy, change to a directory and clone Piggy from Github:
 
 `cd /some/directory`
+
 `git clone https://github.com/harry-thorpe/piggy`
 
 Add the Piggy folder to the PATH:
