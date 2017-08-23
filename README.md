@@ -51,7 +51,7 @@ cluster_intergenic_alignment_files - This is a folder containing alignments of e
 switched_region_alignment_files - This is a folder containing alignments of alternative "switched" IGRs identified by Piggy.
 IGR_presence_absence.csv - An IGR presence/absence matrix with the same structure as that produced by Roary.
 switched_region_divergences.csv - This contains information about the candidate "switched" IGRs identified by Piggy. The columns are as follows:
-* Gene - This gives information on the gene neighbourhood and IGR clusters. _+_+_ is used as a delimiter, and the form is: Gene_1 Gene_2 IGR_1 IGR_2. This means that between Gene_1 and Gene_2, there are two divergent IGRs (IGR_2 and IGR_2), present in different strains. If the upstream method has been used then only one gene will be present.
+* Gene - This gives information on the gene neighbourhood and IGR clusters. `_+_+_` is used as a delimiter, and the form is: Gene_1 Gene_2 IGR_1 IGR_2. This means that between Gene_1 and Gene_2, there are two divergent IGRs (IGR_2 and IGR_2), present in different strains. If the upstream method has been used then only one gene will be present.
 * Id_1, and Id_2 - These are the names of the IGR sequences which have been aligned against each other.
 * SNPs - The number of SNPs in the alignment.
 * Sites - The number of shared sites in the alignment.
