@@ -171,8 +171,7 @@ my $isolate_count=0;
 
 open OUTPUT, ">$out_dir/isolates.txt" or die "Cannot open output file: $out_dir/isolates.txt\n";
 opendir(my $dh, $in_dir);
-while(readdir $dh){
-	my $file=$_;
+while(my $file=readdir $dh){
 	
 	if($file =~ /(\S+)\.gff$/){
 		my $isolate=$1;

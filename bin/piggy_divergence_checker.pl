@@ -10,8 +10,7 @@ open OUTPUT, ">$out_dir/$out_file" or die "Cannot open output file: $out_dir/$ou
 print OUTPUT "Gene,Id_1,Id_2,SNPs,Sites,Length,Nuc_identity,Length_identity\n";
 
 opendir(my $dh, $in_dir) or die "Input folder doesn't exist: $in_dir\n";
-while(readdir $dh){
-	my $file=$_;
+while(my $file=readdir $dh){
 	
 	my $gene="";
 	
