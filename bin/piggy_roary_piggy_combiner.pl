@@ -25,7 +25,9 @@ my %gene_id_hash=();
 open INPUT_R, "$roary_dir/gene_presence_absence.csv" or die "Input file doesn't exist: $roary_dir/gene_presence_absence.csv\n";
 while(my $line=<INPUT_R>){
 	chomp $line;
-	$line=~s/\R//g;
+	$line=~s/\r$//;
+	$line=~s/\n$//;
+	$line=~s/\r\n$//;
 	$line=~s/^"//;
 	$line=~s/"$//;
 	my @line_array=split(/","/, $line);
@@ -65,7 +67,9 @@ my $int="";
 open INPUT_I, "$out_dir/IGR_presence_absence.csv" or die "Input file doesn't exist: $out_dir/IGR_presence_absence.csv\n";
 while(my $line=<INPUT_I>){
 	chomp $line;
-	$line=~s/\R//g;
+	$line=~s/\r$//;
+	$line=~s/\n$//;
+	$line=~s/\r\n$//;
 	$line=~s/^"//;
 	$line=~s/"$//;
 	my @line_array=split(/","/, $line);

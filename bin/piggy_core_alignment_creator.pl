@@ -31,7 +31,9 @@ my @cluster_array=();
 
 open INPUT_I, "$out_dir/IGR_presence_absence.csv" or die "Input file doesn't exist: $out_dir/IGR_presence_absence.csv\n";
 while(my $line=<INPUT_I>){
-	$line=~s/\R//g;
+	$line=~s/\r$//;
+	$line=~s/\n$//;
+	$line=~s/\r\n$//;
 	$line=~s/^"//;
 	$line=~s/"$//;
 	my @line_array=split(/","/, $line);
