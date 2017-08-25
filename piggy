@@ -81,11 +81,6 @@ if($help == 1){
 	usage();
 }
 
-# check out_dir
-if(! -e $out_dir && ! -d $out_dir){
-	mkdir $out_dir or die "Cannot create output folder: $out_dir\n";
-}
-
 # check roary_dir
 if(!$roary_dir){
 	die "--roary_dir not specified\n";
@@ -123,10 +118,6 @@ if($len_identity !~ /^\d+$/){
 if($method !~ /^g|u$/){
 	die "--method must be g or u\n";
 }
-
-# open log file
-open LOG, ">$out_dir/log.txt" or die "Cannot create log file: $out_dir/log.txt\n";
-my $stderr='';
 
 # check dependencies
 my %dep_try_hash=();
@@ -169,7 +160,6 @@ foreach my $dep(@dep_array){
 my @isolate_array=();
 my $isolate_count=0;
 
-open OUTPUT, ">$out_dir/isolates.txt" or die "Cannot open output file: $out_dir/isolates.txt\n";
 opendir(my $dh, $in_dir);
 while(my $file=readdir $dh){
 	
@@ -178,7 +168,6 @@ while(my $file=readdir $dh){
 		
 		push @isolate_array, $isolate;
 		$isolate_count++;
-		print OUTPUT "$isolate\n";
 	}
 }
 closedir $dh;
@@ -191,6 +180,28 @@ if($isolate_count > 0){
 }else{
 	die "$isolate_count isolates found\n";
 }
+
+# check and open out_dir
+if(! -e $out_dir && ! -d $out_dir){
+	mkdir $out_dir or die "Cannot create output folder: $out_dir\n";
+}
+
+# open log file
+open LOG, ">$out_dir/log.txt" or die "Cannot create log file: $out_dir/log.txt\n";
+my $stderr='';
+
+open OUTPUT, ">$out_dir/isolates.txt" or die "Cannot open output file: $out_dir/isolates.txt\n";
+opendir(my $dh, $in_dir);
+while(my $file=readdir $dh){
+	
+	if($file =~ /(\S+)\.gff$/){
+		my $isolate=$1;
+		
+		print OUTPUT "$isolate\n";
+	}
+}
+closedir $dh;
+close OUTPUT;
 
 # open output directories
 if(! -e "$out_dir/coordinate_files" && ! -d "$out_dir/coordinate_files"){
