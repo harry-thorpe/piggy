@@ -257,14 +257,14 @@ for(my $i=0; $i<$isolate_count; $i++){
 	
 		foreach my $tmp_isolate(@tmp_isolate_array){
 		
-			`cat "$out_dir/${tmp_isolate}_IGR_sequences.fasta" >> "$out_dir/IGR_sequences.fasta"`;
+			`cat "$out_dir/isolate_intergenic_files/${tmp_isolate}/${tmp_isolate}_IGR_sequences.fasta" >> "$out_dir/IGR_sequences.fasta"`;
 		
 			if($? != 0){
 				die "failed to concatenate IGR sequences into fasta file\n";
 			}
 		}
 		
-		`$dep_cmd_hash{"parallel"} rm "$out_dir/{}_IGR_sequences.fasta" ::: @tmp_isolate_array`;
+		# don't delete these files!`$dep_cmd_hash{"parallel"} rm "$out_dir/isolate_intergenic_files/{}/{}_IGR_sequences.fasta" ::: @tmp_isolate_array`;
 		
 		my $real_i=($i + 1);
 		print "$real_i/$isolate_count gff files processed\n";
