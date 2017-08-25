@@ -3,6 +3,7 @@ use warnings;
 use strict;
 
 my $out_dir=$ARGV[0];
+my $piggy_bin_path=$ARGV[1];
 
 print STDOUT "Creating IGR cluster files.\n";
 print STDERR "Creating IGR cluster files.\n";
@@ -40,21 +41,27 @@ while(my $line=<INPUT>){
 			open OUTPUT_CLU, ">$out_dir/cluster_intergenic_files/$cluster.fasta" or die "Cannot open output file: $out_dir/cluster_intergenic_files/$cluster.fasta\n";
 			
 			open OUTPUT_CLU_REP, ">$out_dir/cluster_representative_files/$cluster.fasta" or die "Cannot open output file: $out_dir/cluster_representative_files/$cluster.fasta\n";
-		
-			open INPUT_CLU, "$out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta" or die "Input file doesn't exist: $out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta\n";
-			while(my $line=<INPUT_CLU>){
-				chomp $line;
-	
-				if($line =~ /^>(.+)/){
-	
-				}else{
-					print OUTPUT_REP ">${cluster}_+_+_$cluster_id\n$line\n";
-					
-					print OUTPUT_CLU_REP ">${cluster}_+_+_$cluster_id\n$line\n";
-				
-					print OUTPUT_CLU ">$cluster_id\n$line\n";
-				}
-			}
+			
+			my $seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "$cluster_id" "$out_dir/isolate_intergenic_files/$isolate/${isolate}_IGR_sequences.fasta"`;
+			
+			print OUTPUT_REP ">${cluster}_+_+_$cluster_id\n$seq\n";
+			print OUTPUT_CLU_REP ">${cluster}_+_+_$cluster_id\n$seq\n";
+			print OUTPUT_CLU ">$cluster_id\n$seq\n";
+			
+#			open INPUT_CLU, "$out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta" or die "Input file doesn't exist: $out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta\n";
+#			while(my $line=<INPUT_CLU>){
+#				chomp $line;
+#	
+#				if($line =~ /^>(.+)/){
+#	
+#				}else{
+#					print OUTPUT_REP ">${cluster}_+_+_$cluster_id\n$line\n";
+#					
+#					print OUTPUT_CLU_REP ">${cluster}_+_+_$cluster_id\n$line\n";
+#				
+#					print OUTPUT_CLU ">$cluster_id\n$line\n";
+#				}
+#			}
 			
 			close OUTPUT_CLU;
 			close OUTPUT_CLU_REP;
@@ -89,11 +96,15 @@ while(my $line=<INPUT>){
 			# print to cluster file.
 			open OUTPUT_CLU, ">>$out_dir/cluster_intergenic_files/$cluster.fasta" or die "Cannot open output file: $out_dir/cluster_intergenic_files/$cluster.fasta\n";
 		
-			open INPUT_CLU, "$out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta" or die "Input file doesn't exist: $out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta\n";
-			while(my $line=<INPUT_CLU>){
-				
-				print OUTPUT_CLU "$line";
-				
+			my $seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "$cluster_id" "$out_dir/isolate_intergenic_files/$isolate/${isolate}_IGR_sequences.fasta"`;
+			
+			print OUTPUT_CLU ">$cluster_id\n$seq\n";
+			
+#			open INPUT_CLU, "$out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta" or die "Input file doesn't exist: $out_dir/isolate_intergenic_files/$isolate/$cluster_id.fasta\n";
+#			while(my $line=<INPUT_CLU>){
+#				
+#				print OUTPUT_CLU "$line";
+#				
 #				chomp $line;
 #			
 #				if($line =~ /^>(.+)/){
@@ -101,7 +112,7 @@ while(my $line=<INPUT>){
 #				}else{
 #					print OUTPUT_CLU ">$cluster_id\n$line\n";
 #				}
-			}
+#			}
 			
 			close OUTPUT_CLU;
 		}

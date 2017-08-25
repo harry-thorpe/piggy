@@ -299,7 +299,7 @@ if(! -e "$out_dir/cluster_representative_files" && ! -d "$out_dir/cluster_repres
 }
 
 # make IGR cluster output files
-$stderr=`$piggy_bin_path/piggy_cluster_file_creator.pl "$out_dir"`;
+$stderr=`$piggy_bin_path/piggy_cluster_file_creator.pl "$out_dir" "$piggy_bin_path"`;
 
 if($? != 0){
 	die "failed to create IGR cluster files\n";
@@ -452,7 +452,7 @@ if(! -e "$out_dir/switched_region_files" && ! -d "$out_dir/switched_region_files
 	mkdir "$out_dir/switched_region_files" or die "Cannot create output folder: $out_dir/switched_region_files\n";
 }
 
-$stderr=`$piggy_bin_path/piggy_switched_region_creator.pl "$out_dir/roary_piggy_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" "$out_dir/isolate_gene_fragment_files"`;
+$stderr=`$piggy_bin_path/piggy_switched_region_creator.pl "$out_dir/roary_piggy_combined.tab" "$out_dir/cluster_intergenic_files" "$out_dir" "$out_dir/isolate_gene_fragment_files" "$piggy_bin_path"`;
 
 if($? != 0){
 	die "failed to detect candidate switched IGRs\n";

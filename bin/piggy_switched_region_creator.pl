@@ -6,6 +6,7 @@ my $in_file=$ARGV[0];
 my $in_dir=$ARGV[1];
 my $out_dir=$ARGV[2];
 my $in_g_dir=$ARGV[3];
+my $piggy_bin_path=$ARGV[4];
 
 print STDOUT "Detecting candidate switched IGRs...\n";
 print STDERR "Detecting candidate switched IGRs...\n";
@@ -111,26 +112,48 @@ foreach my $gene_pair(@gene_pair_array){
 				
 				open OUTPUT, ">$out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta" or die "Cannot open output file: $out_dir/switched_region_files/${gene_pair}_+_+_$cluster_array[$i]_+_+_$cluster_array[$j]_gene_fragments.fasta\n";
 				
-				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_1.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_1/$gene_1_1.fasta\n";
-				while(my $line=<GENE_FRAG>){
-					
-					print OUTPUT "$line";
-				}
-				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_2.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_1/$gene_1_2.fasta\n";
-				while(my $line=<GENE_FRAG>){
-					
-					print OUTPUT "$line";
-				}
-				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_1.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_2/$gene_2_1.fasta\n";
-				while(my $line=<GENE_FRAG>){
-					
-					print OUTPUT "$line";
-				}
-				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_2.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_2/$gene_2_2.fasta\n";
-				while(my $line=<GENE_FRAG>){
-					
-					print OUTPUT "$line";
-				}
+				my $seq="";
+				
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_1_1}_s" "$in_g_dir/$isolate_1/${isolate_1}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_1_1}_s\n$seq\n";
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_1_1}_e" "$in_g_dir/$isolate_1/${isolate_1}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_1_1}_e\n$seq\n";
+				
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_1_2}_s" "$in_g_dir/$isolate_1/${isolate_1}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_1_2}_s\n$seq\n";
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_1_2}_e" "$in_g_dir/$isolate_1/${isolate_1}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_1_2}_e\n$seq\n";
+				
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_2_1}_s" "$in_g_dir/$isolate_2/${isolate_2}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_2_1}_s\n$seq\n";
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_2_1}_e" "$in_g_dir/$isolate_2/${isolate_2}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_2_1}_e\n$seq\n";
+				
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_2_2}_s" "$in_g_dir/$isolate_2/${isolate_2}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_2_2}_s\n$seq\n";
+				$seq=`"$piggy_bin_path/piggy_fasta_finder.pl" "${gene_2_2}_e" "$in_g_dir/$isolate_2/${isolate_2}_GF_sequences.fasta"`;
+				print OUTPUT ">${gene_2_2}_e\n$seq\n";
+				
+#				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_1.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_1/$gene_1_1.fasta\n";
+#				while(my $line=<GENE_FRAG>){
+#					
+#					print OUTPUT "$line";
+#				}
+#				open GENE_FRAG, "$in_g_dir/$isolate_1/$gene_1_2.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_1/$gene_1_2.fasta\n";
+#				while(my $line=<GENE_FRAG>){
+#					
+#					print OUTPUT "$line";
+#				}
+#				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_1.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_2/$gene_2_1.fasta\n";
+#				while(my $line=<GENE_FRAG>){
+#					
+#					print OUTPUT "$line";
+#				}
+#				open GENE_FRAG, "$in_g_dir/$isolate_2/$gene_2_2.fasta" or die "Input file doesn't exist: $in_g_dir/$isolate_2/$gene_2_2.fasta\n";
+#				while(my $line=<GENE_FRAG>){
+#					
+#					print OUTPUT "$line";
+#				}
 				
 				close OUTPUT;
 				
