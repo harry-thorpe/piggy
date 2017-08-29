@@ -191,7 +191,7 @@ open LOG, ">$out_dir/log.txt" or die "Cannot create log file: $out_dir/log.txt\n
 my $stderr='';
 
 open OUTPUT, ">$out_dir/isolates.txt" or die "Cannot open output file: $out_dir/isolates.txt\n";
-opendir(my $dh, $in_dir);
+opendir($dh, $in_dir);
 while(my $file=readdir $dh){
 	
 	if($file =~ /(\S+)\.gff$/){
