@@ -54,8 +54,8 @@ switched_region_alignment_files - This is a folder containing alignments of alte
 IGR_presence_absence.csv - An IGR presence/absence matrix with the same structure as that produced by Roary. The IGRs in this file are named according to the genome and gene neighbourhood of the IGR, and follow the form: Genome Gene_1 Gene_2 X, where X can be DP, CO_F, CO_R, DT (further described in Figure 1 in the preprint). Gene_1 and Gene_2 are the two flanking genes for the IGR, and these may be replaced by NA if the IGR is at the edge of a contig (so only has one flanking gene). In this case the gene orientation information (X) will also be replaced by NA. The gene orientation information is as follows:
 * DP - Double Promoter   <---- IGR ----> genes are divergently transcribed.
 * DT - Double Terminator ----> IGR <---- genes are convergently transcribed.
-* DP - Co-oriented Forward ----> IGR ----> genes are co-oriented forward.
-* DP - Co-oriented Forward <---- IGR <---- genes are co-oriented reverse.
+* CO_F - Co-oriented Forward ----> IGR ----> genes are co-oriented forward.
+* CO_R - Co-oriented Reverse <---- IGR <---- genes are co-oriented reverse.
 
 switched_region_divergences.csv - This contains information about the candidate "switched" IGRs identified by Piggy. The columns are as follows:
 * Gene - This gives information on the gene neighbourhood and IGR clusters. `_+_+_` is used as a delimiter, and the form is: Gene_1 Gene_2 IGR_1 IGR_2. This means that between Gene_1 and Gene_2, there are two divergent IGRs (IGR_2 and IGR_2), present in different strains. If the upstream method has been used then only one gene will be present.
