@@ -57,8 +57,8 @@ IGR_presence_absence.csv - An IGR presence/absence matrix with the same structur
 * CO_F - Co-oriented Forward ----> IGR ----> genes are co-oriented forward.
 * CO_R - Co-oriented Reverse <---- IGR <---- genes are co-oriented reverse.
 
-switched_region_divergences.csv - This contains information about the candidate "switched" IGRs identified by Piggy. The columns are as follows:
-* Gene - This gives information on the gene neighbourhood and IGR clusters. `_+_+_` is used as a delimiter between fields, and the form is: Gene_1 Gene_2 IGR_1 IGR_2. This means that between Gene_1 and Gene_2, there are two divergent IGRs (IGR_2 and IGR_2), present in different strains. If the upstream method has been used then only one gene will be present.
+switched_region_divergences.csv - This contains information about the candidate "switched" IGRs identified by Piggy. The methods for identifying these are described in the preprint. The columns are as follows:
+* Gene - This gives information on the gene neighbourhood and IGR clusters. `_+_+_` is used as a delimiter between fields, and the form is: Gene_1 Gene_2 IGR_1 IGR_2. This means that between Gene_1 and Gene_2, there are two divergent IGRs (IGR_1 and IGR_2), present in different strains. If the upstream method has been used then only one gene will be present.
 * Id_1, and Id_2 - These are the names of the IGR sequences which have been aligned against each other.
 * SNPs - The number of SNPs in the alignment.
 * Sites - The number of shared sites in the alignment.
