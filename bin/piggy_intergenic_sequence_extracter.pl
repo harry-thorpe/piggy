@@ -9,9 +9,9 @@ my $out_dir=$ARGV[3];
 my $out_iso_dir=$ARGV[4];
 my $in_coor_g_file=$ARGV[5];
 my $out_iso_g_dir=$ARGV[6];
+my $min_len=$ARGV[7];
+my $max_len=$ARGV[8];
 
-my $min_len=30;
-my $max_len=1000;
 my $max_n_prop=0.1;
 
 #open OUTPUT, ">>$out_dir/IGR_sequences.fasta" or die "Cannot open output file: $out_dir/IGR_sequences.fasta\n";

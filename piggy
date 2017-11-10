@@ -19,6 +19,7 @@ Piggy
 --threads|-t	threads [default - 1]
 --nuc_id|-n	min percentage nucleotide identity [default - 90]
 --len_id|-l	min percentage length identity [default - 90]
+--size|-s	size of IGRs to extract [i-j] [default 30-1000]
 --method|-m	method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
 --R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
 --fast|-f	fast mode (doesn't align IGRs or detect switched regions) [default - off]
@@ -55,6 +56,7 @@ my $roary_dir='';
 my $threads=1;
 my $nuc_identity=90;
 my $len_identity=90;
+my $size="30-1000";
 my $method="g";
 my $R_plots=0;
 my $fast=0;
@@ -70,6 +72,7 @@ GetOptions(
 	'threads|t=i' => \$threads,
 	'nuc_id|n=i' => \$nuc_identity,
 	'len_id|l=i' => \$len_identity,
+	'size|s=s' => \$size,
 	'method|m=s' => \$method,
 	'R_plots|R' => \$R_plots,
 	'fast|f' => \$fast,
@@ -112,6 +115,17 @@ if($len_identity !~ /^\d+$/){
 	die "--len_id must be an integer\n";
 }else{
 	$len_identity=($len_identity/100);
+}
+
+# check size
+my $min_len=0;
+my $max_len=0;
+if($size !~ /\d+\-\d+/){
+	die "--size must be of the form i-j, e.g. 30-1000\n";
+}else{
+	my @size_array=split(/\-/, $size);
+	$min_len=$size_array[0];
+	$max_len=$size_array[1];
 }
 
 # check method
@@ -260,7 +274,7 @@ for(my $i=0; $i<$isolate_count; $i++){
 			die "failed extract IGR coordinates from gff files\n";
 		}
 	
-		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" ::: @tmp_isolate_array`;
+		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" "$min_len" "$max_len" ::: @tmp_isolate_array`;
 	
 		if($? != 0){
 			die "failed to extract IGR sequences from files\n";
@@ -288,7 +302,7 @@ for(my $i=0; $i<$isolate_count; $i++){
 # cluster IGRs
 print "Clustering IGRs with cd-hit...\n"; print LOG "Clustering IGRs with cd-hit...\n";
 
-`$dep_cmd_hash{"cdhit"} -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0`;
+`$dep_cmd_hash{"cdhit"} -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 -l 12`;
 
 if($? != 0){
 	die "IGR clustering failed\n";
@@ -327,7 +341,7 @@ if($? != 0){
 	die "failed to create blast db\n";
 }
 
-`$dep_cmd_hash{"blastn"} -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -num_threads "$threads" -dust no -task blastn -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore"`;
+`$dep_cmd_hash{"blastn"} -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -word_size 11 -num_threads "$threads" -dust no -task blastn -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore"`;
 
 if($? != 0){
 	die "failed to do all-vs-all IGR cluster blast search\n";
@@ -491,7 +505,7 @@ for(my $i=0; $i<$switched_region_count; $i++){
 	my $switched_region=$switched_region_array[$i];
 	
 	# blast to check for gene overlaps
-	`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}_gene_fragments.fasta" -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
+	`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}_gene_fragments.fasta" -word_size 11 -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
 	
 	if($? != 0){
 		die "failed to do overlap blast search on $out_dir/switched_region_files/${switched_region}.fasta\n";
@@ -508,7 +522,7 @@ for(my $i=0; $i<$switched_region_count; $i++){
 	# if there are no overlaps
 	if($blast_hit eq "no_hit"){
 		# blast to find homology between candidate switched IGRs
-		`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
+		`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -word_size 11 -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
 		
 		if($? != 0){
 			die "failed to do blast search on $out_dir/switched_region_files/${switched_region}.fasta\n";

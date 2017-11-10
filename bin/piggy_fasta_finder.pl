@@ -19,6 +19,7 @@ while(my $line=<INPUT>){
 		
 		if($name eq $search){
 			print $seq;
+			last;
 		}
 	}
 }
