@@ -52,6 +52,7 @@ while(my $line=<INPUT_R>){
 					my $isolate=$header_array[$i];
 					my $gene_id=$line_array[$i];
 					my $gene=$line_array[0];
+					$gene=~tr/\//_/;
 		
 					$gene_id_hash{$isolate}{$gene_id}=$gene;
 				}

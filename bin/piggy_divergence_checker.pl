@@ -62,14 +62,14 @@ while(my $file=readdir $dh){
 					
 					$comp=1;
 					for(my $pos=0; $pos<$ref_seq_len; $pos++){
-						if($ref_seq_array[$pos] ne "-"){
+						if($ref_seq_array[$pos] !~ /n|N|-/){
 							$ref_seq_sites++;
 						}
-						if($seq_array[$pos] ne "-"){
+						if($seq_array[$pos] !~ /n|N|-/){
 							$seq_sites++;
 						}
 					
-						if($ref_seq_array[$pos] ne "-" && $seq_array[$pos] ne "-"){
+						if($ref_seq_array[$pos] !~ /n|N|-/ && $seq_array[$pos] !~ /n|N|-/){
 							$sites++;
 							if($ref_seq_array[$pos] ne $seq_array[$pos]){
 								$snps++;
