@@ -19,6 +19,7 @@ Piggy
 --threads|-t	threads [default - 1]
 --nuc_id|-n	min percentage nucleotide identity [default - 90]
 --len_id|-l	min percentage length identity [default - 90]
+--edges|-e	keep IGRs at the edge of contigs [default - off]
 --size|-s	size of IGRs to extract [i-j] [default 30-1000]
 --method|-m	method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
 --R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
@@ -56,6 +57,7 @@ my $roary_dir='';
 my $threads=1;
 my $nuc_identity=90;
 my $len_identity=90;
+my $contig_edges=0;
 my $size="30-1000";
 my $method="g";
 my $R_plots=0;
@@ -72,6 +74,7 @@ GetOptions(
 	'threads|t=i' => \$threads,
 	'nuc_id|n=i' => \$nuc_identity,
 	'len_id|l=i' => \$len_identity,
+	'edges|e=i' => \$contig_edges,
 	'size|s=s' => \$size,
 	'method|m=s' => \$method,
 	'R_plots|R' => \$R_plots,
@@ -115,6 +118,12 @@ if($len_identity !~ /^\d+$/){
 	die "--len_id must be an integer\n";
 }else{
 	$len_identity=($len_identity/100);
+}
+
+if($contig_edges == 0){
+	$contig_edges="remove";
+}else{
+	$contig_edges="keep";
 }
 
 # check size
@@ -274,7 +283,7 @@ for(my $i=0; $i<$isolate_count; $i++){
 			die "failed extract IGR coordinates from gff files\n";
 		}
 	
-		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" "$min_len" "$max_len" ::: @tmp_isolate_array`;
+		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_intergenic_sequence_extracter.pl "{}" "$out_dir/gff_files/{}.gff.modified" "$out_dir/coordinate_files/{}_intergenic_coordinates.tab" "$out_dir" "$out_dir/isolate_intergenic_files/{}" "$out_dir/coordinate_files/{}_gene_coordinates.tab" "$out_dir/isolate_gene_fragment_files/{}" "$min_len" "$max_len" "$contig_edges" ::: @tmp_isolate_array`;
 	
 		if($? != 0){
 			die "failed to extract IGR sequences from files\n";

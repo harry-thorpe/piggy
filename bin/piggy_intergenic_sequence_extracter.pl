@@ -11,6 +11,7 @@ my $in_coor_g_file=$ARGV[5];
 my $out_iso_g_dir=$ARGV[6];
 my $min_len=$ARGV[7];
 my $max_len=$ARGV[8];
+my $contig_edges=$ARGV[9];
 
 my $max_n_prop=0.1;
 
@@ -77,12 +78,18 @@ foreach $contig(@contig_array){
 		my $sta=$line_array[2];
 		my $end=$line_array[3];
 		my $len=$line_array[4];
+		my $type=$line_array[5];
 		my $contig_id=$line_array[6];
 		
 		if($line !~ /^Name\tGene_name\tStart\tEnd\tLength\tType/){
 			if($contig eq $contig_id){
 				
-				if($len >= $min_len && $len <= $max_len){
+				my $keep=1;
+				if($contig_edges eq "remove" && $type eq "NA"){
+					$keep=0;
+				}
+				
+				if($len >= $min_len && $len <= $max_len && $keep == 1){
 					my $ind_sta=($sta-1);
 					my $ind_end=($end-1);
 					
