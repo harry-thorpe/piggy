@@ -311,7 +311,7 @@ for(my $i=0; $i<$isolate_count; $i++){
 # cluster IGRs
 print "Clustering IGRs with cd-hit...\n"; print LOG "Clustering IGRs with cd-hit...\n";
 
-`$dep_cmd_hash{"cdhit"} -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 -l 12`;
+`$dep_cmd_hash{"cdhit"} -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 -l 11`;
 
 if($? != 0){
 	die "IGR clustering failed\n";
@@ -350,7 +350,7 @@ if($? != 0){
 	die "failed to create blast db\n";
 }
 
-`$dep_cmd_hash{"blastn"} -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -word_size 11 -num_threads "$threads" -dust no -task blastn -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore"`;
+`$dep_cmd_hash{"blastn"} -db "$out_dir/representative_clusters_db" -query "$out_dir/representative_clusters.fasta" -word_size 10 -num_threads "$threads" -dust no -task blastn -out "$out_dir/representative_clusters_blast_out.tab" -outfmt "6 qseqid sseqid qlen slen pident length mismatch gapopen qstart qend sstart send evalue bitscore"`;
 
 if($? != 0){
 	die "failed to do all-vs-all IGR cluster blast search\n";
@@ -514,7 +514,7 @@ for(my $i=0; $i<$switched_region_count; $i++){
 	my $switched_region=$switched_region_array[$i];
 	
 	# blast to check for gene overlaps
-	`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}_gene_fragments.fasta" -word_size 11 -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
+	`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}_gene_fragments.fasta" -word_size 10 -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
 	
 	if($? != 0){
 		die "failed to do overlap blast search on $out_dir/switched_region_files/${switched_region}.fasta\n";
@@ -531,7 +531,7 @@ for(my $i=0; $i<$switched_region_count; $i++){
 	# if there are no overlaps
 	if($blast_hit eq "no_hit"){
 		# blast to find homology between candidate switched IGRs
-		`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -word_size 11 -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
+		`$dep_cmd_hash{"blastn"} -query "$out_dir/switched_region_files/${switched_region}.fasta" -subject "$out_dir/switched_region_files/${switched_region}.fasta" -word_size 10 -dust no -task blastn -outfmt 6 -out "$out_dir/blast_out.tab"`;
 		
 		if($? != 0){
 			die "failed to do blast search on $out_dir/switched_region_files/${switched_region}.fasta\n";
