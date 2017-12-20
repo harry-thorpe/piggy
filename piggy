@@ -311,7 +311,7 @@ for(my $i=0; $i<$isolate_count; $i++){
 # cluster IGRs
 print "Clustering IGRs with cd-hit...\n"; print LOG "Clustering IGRs with cd-hit...\n";
 
-`$dep_cmd_hash{"cdhit"} -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 -l 11`;
+`$dep_cmd_hash{"cdhit"} -i $out_dir/IGR_sequences.fasta -o "$out_dir/IGR_sequences_clustered.fasta" -T "$threads" -n 10 -d 0 -c "$cdhit_nuc_identity" -G 0 -s "$len_identity" -aS 0.9 -g 0 -r 1 -mask N -M 0 -l 9`;
 
 if($? != 0){
 	die "IGR clustering failed\n";
