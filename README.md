@@ -48,9 +48,9 @@ In order for Piggy to work, Roary must be run first. The output folder produced 
 
 Piggy produces a number of output files:
 
-cluster_intergenic_alignment_files - This is a folder containing alignments of each IGR cluster defined by Piggy.
+cluster_intergenic_alignment_files - This is a folder containing alignments of each IGR cluster defined by Piggy. Where sequences have been reversed complemented to align them, the fasta header has been appended with '\_R'.
 
-switched_region_alignment_files - This is a folder containing alignments of alternative "switched" IGRs identified by Piggy.
+switched_region_alignment_files - This is a folder containing alignments of alternative "switched" IGRs identified by Piggy. Where sequences have been reversed complemented to align them, the fasta header has been appended with '\_R'.
 
 IGR_presence_absence.csv - An IGR presence/absence matrix with the same structure as that produced by Roary. The IGRs in this file are named according to the genome and gene neighbourhood of the IGR, and follow the form: Genome Gene_1 Gene_2 X, where X can be DP, CO_F, CO_R, DT (further described in Figure 1 in the preprint). `_+_+_` is used as a delimiter between fields. Gene_1 and Gene_2 are the two flanking genes for the IGR, and these may be replaced by NA if the IGR is at the edge of a contig (so only has one flanking gene). In this case the gene orientation information (X) will also be replaced by NA. The gene orientation information is as follows:
 * DP - Double Promoter   <---- IGR ----> genes are divergently transcribed.
