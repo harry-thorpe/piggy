@@ -441,7 +441,7 @@ for(my $i=0; $i<$cluster_count; $i++){
 			die "failed to align IGR cluster files\n";
 		}
 		
-		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_fasta_converter.pl "$out_dir/cluster_intergenic_files/{}_aligned_tmp.fasta" "$out_dir/cluster_intergenic_files/{}_aligned.fasta" ::: @tmp_cluster_array`;
+		`$dep_cmd_hash{"parallel"} $piggy_bin_path/piggy_fasta_converter.pl "$out_dir/cluster_intergenic_files/{}_aligned_tmp.fasta" "$out_dir/cluster_intergenic_files/{}_aligned.fasta" "$out_dir/isolates.txt" ::: @tmp_cluster_array`;
 		
 		if($? != 0){
 			die "failed to convert IGR cluster files\n";
@@ -553,7 +553,7 @@ for(my $i=0; $i<$switched_region_count; $i++){
 				die "failed to align $out_dir/switched_region_files/${switched_region}.fasta\n";
 			}
 			
-			`$piggy_bin_path/piggy_fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta"`;
+			`$piggy_bin_path/piggy_fasta_converter.pl "$out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta" "$out_dir/switched_region_files/${switched_region}_aligned.fasta" "$out_dir/isolates.txt"`;
 			
 			if($? != 0){
 				die "failed to convert $out_dir/switched_region_files/${switched_region}_aligned_tmp.fasta\n";
