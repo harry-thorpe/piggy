@@ -74,7 +74,7 @@ GetOptions(
 	'threads|t=i' => \$threads,
 	'nuc_id|n=i' => \$nuc_identity,
 	'len_id|l=i' => \$len_identity,
-	'edges|e=i' => \$contig_edges,
+	'edges|e' => \$contig_edges,
 	'size|s=s' => \$size,
 	'method|m=s' => \$method,
 	'R_plots|R' => \$R_plots,
