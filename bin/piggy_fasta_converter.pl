@@ -47,10 +47,10 @@ while(my $line=<INPUT>){
         }
 
         if($seq_count == 0){
-			print OUTPUT ">$id_p\n";
-		}else{
+            print OUTPUT ">$id_p\n";
+        }else{
 			print OUTPUT "\n>$id_p\n";
-		}
+        }
 
         $seq_count++;
 	}else{
