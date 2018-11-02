@@ -49,14 +49,14 @@ while(my $line=<INPUT>){
         if($seq_count == 0){
             print OUTPUT ">$id_p\n";
         }else{
-			print OUTPUT "\n>$id_p\n";
+            print OUTPUT "\n>$id_p\n";
         }
 
         $seq_count++;
-	}else{
-		$line=~tr/a-z/A-Z/;
-		print OUTPUT "$line";
-	}
+    }else{
+        $line=~tr/a-z/A-Z/;
+        print OUTPUT "$line";
+    }
 }
 print OUTPUT "\n";
 
