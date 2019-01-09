@@ -74,6 +74,7 @@ foreach my $cluster(@cluster_sorted_array){
 	my $ave_seqs=($cluster_seq_count_hash{$cluster}/$cluster_isolate_count_hash{$cluster});
 	
 	print OUTPUT "\"$cluster\",\"\",\"\",\"$cluster_isolate_count_hash{$cluster}\",\"$cluster_seq_count_hash{$cluster}\",\"$ave_seqs\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"";
+    print OUTPUT_RTAB "$cluster";
 	foreach my $isolate(@isolate_array){
 		if($cluster_hash{$cluster}{$isolate}){
 			print OUTPUT ",\"$cluster_hash{$cluster}{$isolate}\"";
