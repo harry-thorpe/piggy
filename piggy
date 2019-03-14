@@ -47,7 +47,7 @@ if($piggy_cmd =~ /^(.+)\/[^\/]+$/){
 }else{
 	die "can't find piggy path\n";
 }
-my $piggy_bin_path="${piggy_path}/bin";
+my $piggy_bin_path="${piggy_path}/scripts_piggy";
 print "$piggy_bin_path\n";
 
 # command line options
