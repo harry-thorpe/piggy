@@ -41,7 +41,7 @@ if(@ARGV == 0){
 
 my $piggy_cmd=$0;
 my $piggy_path='';
-if($piggy_cmd =~ /^(.+)\/[^\/]+$/){
+if($piggy_cmd =~ /^(.+)\/bin\/piggy$/){
 	$piggy_path=$1;
 	print "$piggy_path\n";
 }else{
