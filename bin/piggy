@@ -96,7 +96,9 @@ if($help == 1){
 
 # check version
 if($version_req == 1){
-    die "$version\n";
+    print "$version\n";
+
+    exit;
 }
 
 # print paths
