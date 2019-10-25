@@ -31,19 +31,19 @@ Piggy requires bacterial genome assemblies in GFF3 format (such as those produce
 
 Piggy accepts the following options:
 
-`--in_dir|-i    input folder [default - current folder]`
-`--out_dir|-o	  output folder [default - current folder/piggy_out]`
-`--roary_dir|-r	folder where roary output is stored [required]`
-`--threads|-t	  threads [default - 1]`
-`--nuc_id|-n	    min percentage nucleotide identity [default - 90]`
-`--len_id|-l	    min percentage length identity [default - 90]`
-`--edges|-e	    keep IGRs at the edge of contigs [default - off]`
-`--size|-s	      size of IGRs to extract [i-j] [default 30-1000]`
-`--method|-m	    method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]`
-`--R_plots|-R	  make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]`
-`--fast|-f       fast mode (doesn't align IGRs or detect switched regions) [default - off]`
-`--help|-h	      help`
-`--version|-v    version`
+`--in_dir|-i `&emsp;` input folder [default - current folder]`\
+`--out_dir|-o `&emsp;` output folder [default - current folder/piggy_out]`\
+`--roary_dir|-r `&emsp;` folder where roary output is stored [required]`\
+`--threads|-t `&emsp;` threads [default - 1]`\
+`--nuc_id|-n `&emsp;` min percentage nucleotide identity [default - 90]`\
+`--len_id|-l `&emsp;` min percentage length identity [default - 90]`\
+`--edges|-e `&emsp;` keep IGRs at the edge of contigs [default - off]`\
+`--size|-s `&emsp;` size of IGRs to extract [i-j] [default 30-1000]`\
+`--method|-m `&emsp;` method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]`\
+`--R_plots|-R `&emsp;` make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]`\
+`--fast|-f `&emsp;` fast mode (doesn't align IGRs or detect switched regions) [default - off]`\
+`--help|-h `&emsp;` help`\
+`--version|-v `&emsp;` version`
 
 In order for Piggy to work, Roary must be run first. The output folder produced by Roary is required as an input to Piggy (specified by --roary_dir). We recommend running Roary with the -s option to keep paralogs together. This is because when Piggy searches for switched IGRs it uses only single copy genes and cannot distinguish between paralogs.
 
