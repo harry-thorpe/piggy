@@ -38,7 +38,7 @@ Piggy accepts the following options:
 `--nuc_id|-n `&emsp;` <INT> `&emsp;` min percentage nucleotide identity [default - 90]`\
 `--len_id|-l `&emsp;` <INT> `&emsp;` min percentage length identity [default - 90]`\
 `--edges|-e `&emsp;` keep IGRs at the edge of contigs [default - off]`\
-`--size|-s `&emsp;` <INT-INT> `&emsp;` size of IGRs to extract [i-j] [default 30-1000]`\
+`--size|-s `&emsp;` <STR> `&emsp;` size of IGRs to extract [i-j] [default 30-1000]`\
 `--method|-m `&emsp;` <STR> `&emsp;` method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]`\
 `--R_plots|-R `&emsp;` make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]`\
 `--fast|-f `&emsp;` fast mode (doesn't align IGRs or detect switched regions) [default - off]`\
