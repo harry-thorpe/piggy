@@ -16,19 +16,19 @@ print
 "
 Piggy - version $version
 
---in_dir|-i	input folder [default - current folder]
---out_dir|-o	output folder [default - current folder/piggy_out]
---roary_dir|-r	folder where roary output is stored [required]
---threads|-t	threads [default - 1]
---nuc_id|-n	min percentage nucleotide identity [default - 90]
---len_id|-l	min percentage length identity [default - 90]
---edges|-e	keep IGRs at the edge of contigs [default - off]
---size|-s	size of IGRs to extract [i-j] [default 30-1000]
---method|-m	method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
---R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
---fast|-f	fast mode (doesn't align IGRs or detect switched regions) [default - off]
---help|-h	help
---version|-v    version
+--in_dir|-i     <STR>   input folder [default - current folder]
+--out_dir|-o    <STR>   output folder [default - current folder/piggy_out]
+--roary_dir|-r  <STR>   folder where roary output is stored [required]
+--threads|-t    <INT>   threads [default - 1]
+--nuc_id|-n     <INT>   min percentage nucleotide identity [default - 90]
+--len_id|-l     <INT>   min percentage length identity [default - 90]
+--edges|-e              keep IGRs at the edge of contigs [default - off]
+--size|-s       <STR>   size of IGRs to extract [i-j] [default 30-1000]
+--method|-m     <STR>   method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
+--R_plots|-R            make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
+--fast|-f               fast mode (doesn't align IGRs or detect switched regions) [default - off]
+--help|-h               help
+--version|-v            version
 
 ";
 
