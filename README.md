@@ -31,15 +31,15 @@ Piggy requires bacterial genome assemblies in GFF3 format (such as those produce
 
 Piggy accepts the following options:
 
-`--in_dir|-i `&emsp;` input folder [default - current folder]`\
-`--out_dir|-o `&emsp;` output folder [default - current folder/piggy_out]`\
-`--roary_dir|-r `&emsp;` folder where roary output is stored [required]`\
-`--threads|-t `&emsp;` threads [default - 1]`\
-`--nuc_id|-n `&emsp;` min percentage nucleotide identity [default - 90]`\
-`--len_id|-l `&emsp;` min percentage length identity [default - 90]`\
+`--in_dir|-i `&emsp;` <STR> `&emsp;` input folder [default - current folder]`\
+`--out_dir|-o `&emsp;` <STR> `&emsp;` output folder [default - current folder/piggy_out]`\
+`--roary_dir|-r `&emsp;` <STR> `&emsp;` folder where roary output is stored [required]`\
+`--threads|-t `&emsp;` <INT> `&emsp;` threads [default - 1]`\
+`--nuc_id|-n `&emsp;` <INT> `&emsp;` min percentage nucleotide identity [default - 90]`\
+`--len_id|-l `&emsp;` <INT> `&emsp;` min percentage length identity [default - 90]`\
 `--edges|-e `&emsp;` keep IGRs at the edge of contigs [default - off]`\
-`--size|-s `&emsp;` size of IGRs to extract [i-j] [default 30-1000]`\
-`--method|-m `&emsp;` method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]`\
+`--size|-s `&emsp;` <INT-INT> `&emsp;` size of IGRs to extract [i-j] [default 30-1000]`\
+`--method|-m `&emsp;` <STR> `&emsp;` method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]`\
 `--R_plots|-R `&emsp;` make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]`\
 `--fast|-f `&emsp;` fast mode (doesn't align IGRs or detect switched regions) [default - off]`\
 `--help|-h `&emsp;` help`\
