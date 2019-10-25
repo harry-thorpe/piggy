@@ -17,7 +17,7 @@ If you don't want to use conda then the following dependencies will have to be i
 * Roary
 * Mafft, BLASTN, CD-HIT, GNU Parallel (these should all be installed with Roary by default)
 
-#### Piggy
+### Piggy
 
 Once the dependencies are installed clone the piggy repository from github:
 
