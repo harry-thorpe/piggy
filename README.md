@@ -1,25 +1,29 @@
 # Piggy
 
-Piggy is a tool for analysing the intergenic component of bacterial genomes. It is designed to be used in conjunction with Roary (https://github.com/sanger-pathogens/Roary). The preprint describing Piggy can be found at http://www.biorxiv.org/content/early/2017/08/22/179515.
+Piggy is a tool for analysing the intergenic component of bacterial genomes. It is designed to be used in conjunction with Roary (https://github.com/sanger-pathogens/Roary).
+
+The paper describing Piggy can be found at: https://doi.org/10.1093/gigascience/giy015
 
 ## Installation
 
-Piggy has a number of dependencies:
+### Dependencies
+
+Piggy has a number of dependencies, and these are all also required by Roary. The easiest way to install piggy is to install Roary first with conda, and then clone the piggy repository. Create a new environment and install Roary v3.12.0:
+
+`conda install roary=3.12.0`
+
+If you don't want to use conda then the following dependencies will have to be installed manually.
 
 * Roary
 * Mafft, BLASTN, CD-HIT, GNU Parallel (these should all be installed with Roary by default)
 
-To install Piggy, change to a directory and clone Piggy from Github:
+#### Piggy
 
-`cd /some/directory`
+Once the dependencies are installed clone the piggy repository from github:
 
-`git clone https://github.com/harry-thorpe/piggy`
+`git clone https://github.com/harry-thorpe/piggy.git`
 
-Add the Piggy folder to the PATH:
-
-`export PATH="$PATH:/some/directory/piggy"`
-
-Check that the piggy executable and all the scripts in piggy/bin have executable permissions, and test it by typing `piggy` into the terminal. This should bring up a list of options.
+The piggy executable is in piggy/bin, so either add this directory to your $PATH or run it by specifying its location in the terminal. When piggy is run with no options it should print a help menu.
 
 ## Usage
 
@@ -27,20 +31,19 @@ Piggy requires bacterial genome assemblies in GFF3 format (such as those produce
 
 Piggy accepts the following options:
 
-    --in_dir|-i	    input folder [default - current folder]
-    --out_dir|-o	output folder [default - current folder/piggy_out]
-    --roary_dir|-r	folder where roary output is stored [required]
-    --threads|-t	threads [default - 1]
-    --nuc_id|-n	    min percentage nucleotide identity [default - 90]
-    --len_id|-l	    min percentage length identity [default - 90]
-    --size|-s	size of IGRs to extract [i-j] [default 30-1000]
-    --method|-m	    method for detecting switched IGRs [g - gene_pair, u - upstream] 
-                    [default - g]
-    --R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - 
-                    off]
-    --fast|-f	    fast mode (doesn't align IGRs or detect switched regions) 
-                    [default - off]
-    --help|-h	    help
+--in_dir|-i	input folder [default - current folder]
+--out_dir|-o	output folder [default - current folder/piggy_out]
+--roary_dir|-r	folder where roary output is stored [required]
+--threads|-t	threads [default - 1]
+--nuc_id|-n	min percentage nucleotide identity [default - 90]
+--len_id|-l	min percentage length identity [default - 90]
+--edges|-e	keep IGRs at the edge of contigs [default - off]
+--size|-s	size of IGRs to extract [i-j] [default 30-1000]
+--method|-m	method for detecting switched IGRs [g - gene_pair, u - upstream] [default - g]
+--R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
+--fast|-f	fast mode (doesn't align IGRs or detect switched regions) [default - off]
+--help|-h	help
+--version|-v    version
 
 In order for Piggy to work, Roary must be run first. The output folder produced by Roary is required as an input to Piggy (specified by --roary_dir). We recommend running Roary with the -s option to keep paralogs together. This is because when Piggy searches for switched IGRs it uses only single copy genes and cannot distinguish between paralogs.
 
