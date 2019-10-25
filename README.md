@@ -8,7 +8,7 @@ The paper describing Piggy can be found at: https://doi.org/10.1093/gigascience/
 
 ### Dependencies
 
-Piggy has a number of dependencies, and these are all also required by Roary. The easiest way to install piggy is to install Roary first with conda, and then clone the piggy repository. Create a new environment and install Roary v3.12.0:
+Piggy has a number of dependencies, and these are all also required by Roary. The easiest way to install piggy is to install Roary first with conda, and then clone the piggy repository. Create a new conda environment and install Roary v3.12.0:
 
 `conda install roary=3.12.0`
 
