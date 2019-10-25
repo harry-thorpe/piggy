@@ -5,13 +5,16 @@ use strict;
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Cwd;
+use Cwd qw(abs_path);
 use File::Copy;
+
+my $version="1.5";
 
 sub usage {
 
 print
 "
-Piggy
+Piggy - version $version
 
 --in_dir|-i	input folder [default - current folder]
 --out_dir|-o	output folder [default - current folder/piggy_out]
@@ -39,19 +42,20 @@ if(@ARGV == 0){
 	usage();
 }
 
-my $piggy_cmd=$0;
+my $piggy_cmd=abs_path($0);
+
 my $piggy_path='';
 if($piggy_cmd =~ /^(.+)\/bin\/piggy$/){
 	$piggy_path=$1;
-	print "$piggy_path\n";
 }else{
 	die "can't find piggy path\n";
 }
 my $piggy_bin_path="${piggy_path}/scripts_piggy";
-print "$piggy_bin_path\n";
+
+my $cur_dir=getcwd($0);
 
 # command line options
-my $in_dir=getcwd($0);
+my $in_dir=$cur_dir;
 my $out_dir="$in_dir/piggy_out";
 my $roary_dir='';
 my $threads=1;
@@ -63,6 +67,7 @@ my $method="g";
 my $R_plots=0;
 my $fast=0;
 my $help=0;
+my $version_req=0;
 
 # cdhit nuc_identity
 my $cdhit_nuc_identity=90;
@@ -80,12 +85,24 @@ GetOptions(
 	'R_plots|R' => \$R_plots,
 	'fast|f' => \$fast,
 	'help|h' => \$help,
+    'version|v' => \$version_req,
 ) or die "Piggy died because unknown options were used\n";
 
 # check help
 if($help == 1){
 	usage();
 }
+
+# check version
+if($version_req == 1){
+    die "$version\n";
+}
+
+# print paths
+print "piggy PATH: $piggy_cmd\n";
+print "piggy base directory: $piggy_path\n";
+print "piggy scripts directory: $piggy_bin_path\n";
+print "current directory: $cur_dir\n";
 
 # check roary_dir
 if(!$roary_dir){
