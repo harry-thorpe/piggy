@@ -28,6 +28,7 @@ Piggy - version $version
 --R_plots|-R	make R plots (requires R, Rscript, ggplot2, reshape2) [default - off]
 --fast|-f	fast mode (doesn't align IGRs or detect switched regions) [default - off]
 --help|-h	help
+--version|-v
 
 ";
 
