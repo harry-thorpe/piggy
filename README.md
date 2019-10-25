@@ -23,7 +23,7 @@ Once the dependencies are installed clone the piggy repository from github:
 
 `git clone https://github.com/harry-thorpe/piggy.git`
 
-The piggy executable is in `piggy/bin`, so either add this directory to your $PATH or run it by specifying its location in the terminal. When piggy is run with no options it should print a help menu.
+The piggy executable is in `piggy/bin`, so either add this directory to your `$PATH` or run it by specifying its location in the terminal. When piggy is run with no options it should print a help menu.
 
 ## Usage
 
