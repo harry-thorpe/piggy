@@ -12,7 +12,7 @@ Piggy has a number of dependencies, and these are all also required by Roary. Th
 
 `conda install roary=3.12.0`
 
-If you don't want to use conda then the following dependencies will have to be installed manually.
+If you don't want to use conda then the following dependencies will have to be installed manually:
 
 * Roary
 * Mafft, BLASTN, CD-HIT, GNU Parallel (these should all be installed with Roary by default)
